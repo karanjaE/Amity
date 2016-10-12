@@ -17,7 +17,7 @@ class Room(object):
 
 		rooms_list.append(room_dict)
 		# rooms_list.append(room_name)
-		
+
 	def print_allocations(self):
 		"""Prints all rooms and all the people that have been allocated 
 		those rooms
@@ -31,7 +31,7 @@ class Room(object):
 class Office(Room):
 	"""Performs tasks unique to offices
 	"""
-	def __init__(self, name):
+	def __init__(self):
 		super(Office, self).__init__(r_type="OFFICE", capacity=6)
 
 class LivingSpace(Room):
@@ -40,6 +40,15 @@ class LivingSpace(Room):
 	def __init__(self):
 		super(LivingSpace, self).__init__(r_type="LIVINGSPACE", capacity=4)
 
+
+
+
+
 l = LivingSpace()
 l.create_room('Krypton')
+
+
+s = Office()
+s.create_room('Shannara')
+
 print(rooms_list)
