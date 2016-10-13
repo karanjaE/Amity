@@ -1,6 +1,3 @@
-# from amity.amity import Amity
-
-rooms_list = []
 class Room(object):
 	"""Super class for rooms. Defines methods that affect
 	both office	and living space classes.
@@ -8,25 +5,6 @@ class Room(object):
 	def __init__(self, r_type=None, capacity=None):
 		self.r_type = r_type
 		self.capacity = capacity
-
-	def create_room(self,room_name):
-		room_dict = dict()
-		room_dict["Name"] = room_name
-		room_dict["Type"] = self.r_type
-		room_dict["Capacity"] = self.capacity
-
-		rooms_list.append(room_dict)
-		# rooms_list.append(room_name)
-
-	def print_allocations(self):
-		"""Prints all rooms and all the people that have been allocated 
-		those rooms
-		"""
-		pass
-
-	def print_unallocated(self):
-		pass
-
 
 class Office(Room):
 	"""Performs tasks unique to offices
@@ -44,11 +22,11 @@ class LivingSpace(Room):
 
 
 
-l = LivingSpace()
-l.create_room('Krypton')
+# l = LivingSpace()
+# l.create_room('Krypton')
+# j = LivingSpace()
+# j.create_room('Jail')
+# s = Office()
+# s.create_room('Krypton')
 
-
-s = Office()
-s.create_room('Shannara')
-
-print(rooms_list)
+# print(tabulate(rooms_list, headers="keys"))
