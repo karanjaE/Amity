@@ -94,6 +94,8 @@ class Amity(object):
 		rooms_list[randroom]["Occupants"].append(person_name)
 		return
 
+		    
+
 
 
 
