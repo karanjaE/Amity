@@ -4,8 +4,8 @@ import tabulate
 from people.people import Fellow, Staff
 from rooms.rooms import LivingSpace, Office
 
-rooms_list = dict()
-person_list = dict()
+rooms_list = {}
+person_list = {}
 
 class Amity(object):
 	"""Holds all the core functionalities of the app
@@ -14,7 +14,7 @@ class Amity(object):
 		pass
 
 	def create_room(self,room_name, r_type):
-		"""Creates a new room. Depending on which argument is passes, the 
+		"""Creates a new room. Depending on which argument is passes, the
 		room can either be a (L)LivingSpace or (O)Office
 		"""
 		rooms_list[room_name] = dict()
@@ -54,7 +54,7 @@ class Amity(object):
 				indx += 1
 		l = (set(self.av_rooms))
 		return list(l)
-		
+
 
 
 	def allocate_random_office(self):
@@ -67,7 +67,7 @@ class Amity(object):
 
 	def add_person(self, person_name, person_desig):
 		"""Creates a new person, allocates a random office and if they are
-		Fellow, allows them to request for accomodation by passing (Y) as 
+		Fellow, allows them to request for accomodation by passing (Y) as
 		an argument for needs_accomodation
 		"""
 		person_list[person_name] = dict()
@@ -89,12 +89,12 @@ class Amity(object):
 		else:
 			return("Invalid designation")
 
-		
+
 		#Add person to room occupants
 		rooms_list[randroom]["Occupants"].append(person_name)
 		return
 
-		    
+
 
 
 
@@ -123,7 +123,7 @@ class Amity(object):
 		pass
 
 	def delete_person(self):
-		"""remove a person and release the space in the room/s that 
+		"""remove a person and release the space in the room/s that
 		had been allocated to them
 		"""
 		pass
@@ -146,7 +146,7 @@ class Amity(object):
 
 
 
-		
+
 
 ed = Amity()
 ed.create_room("Hi", "L")
