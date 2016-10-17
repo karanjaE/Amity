@@ -1,6 +1,5 @@
 class Person(object):
-    def __init__(self, name, designation=None, needs_acc="N"):
-        self.name = name
+    def __init__(self, designation=None, needs_acc="N"):
         self.designation = designation
         # self.office = office
         self.needs_acc = needs_acc
