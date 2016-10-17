@@ -76,14 +76,15 @@ class Amity(object):
 
         return
 
-    def reallocate_person(name, r_type, new_room):
-        if r_type == "O":
-            cur_office = people_list[name]["Office"]
-            print(rooms_list[cur_office]["Members"])
-            # if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
-                # rooms_list[cur_office]["Members"].remove(name)
-                # people_list[name]["Office"] = new_room
-                # rooms_list[new_room]["Members"].append(name)
+    # @staticmethod
+    # def reallocate_person(name, r_type, new_room):
+    #     if r_type == "O":
+    #         cur_office = people_list[name]["Office"]
+    #         # print(rooms_list[cur_office]["Members"])
+    #         if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
+    #             rooms_list[cur_office]["Members"].remove(name)
+    #             people_list[name]["Office"] = new_room
+    #             rooms_list[new_room]["Members"].append(name)
 
     def remove_person(name):
         #remove from office
@@ -97,9 +98,10 @@ class Amity(object):
         del people_list[name]
         return
 
-
+    @staticmethod
     def print_room(name):
-        pass
+        print("Showing members in %s:" % name)
+        
 
     def print_allocations():
         pass
@@ -132,7 +134,7 @@ Amity.add_person("Hatty", "S")
 Amity.add_person("Shee", "F")
 
 
-Amity.reallocate_person("Drew", "O", "Valhalla")
+# Amity.reallocate_person("Drew", "O", "Valhalla")
 Amity.remove_person("Hatty")
 
 print("+++++++++++++++++\n+++++++++++++")

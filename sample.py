@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from rooms import LivingSpace, Office
+# from rooms import LivingSpace, Office
 
 d = [
 	{
