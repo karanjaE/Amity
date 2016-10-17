@@ -3,7 +3,7 @@ import unittest
 
 sys.path.append("../../checkpoints/")
 
-from Amity.amity import amity
+from Amity import amity
 
 class TestAmity(unittest.TestCase):
     def setUp(self):
