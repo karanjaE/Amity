@@ -8,7 +8,6 @@ from people.people import Fellow, Staff
 rooms_list = {}
 people_list = {}
 
-
 def generate_random_l_space():
     l_spaces = []
     r_lst = rooms_list.keys()
@@ -72,21 +71,35 @@ class Amity(object):
                 people_list[name]["LivingSpace"] = random_l_space
             # Add person name to room members
             rooms_list[random_l_space]["Members"].append(name)
+            rooms_list[random_office]["Members"].append(name)
 
         else:
             print("Error: Invalid designation")
 
         return
 
-    # @staticmethod
-    # def reallocate_person(name, r_type, new_room):
-    #     if r_type == "O":
-    #         cur_office = people_list[name]["Office"]
-    #         # print(rooms_list[cur_office]["Members"])
-    #         if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
-    #             rooms_list[cur_office]["Members"].remove(name)
-    #             people_list[name]["Office"] = new_room
-    #             rooms_list[new_room]["Members"].append(name)
+    @staticmethod
+    def reallocate_person(name, r_type, new_room):
+        if r_type == "O":
+            current_office = people_list[name]["Office"]
+            if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
+                rooms_list[current_office]["Members"].remove(name)
+                people_list[name]["Office"] = new_room
+                rooms_list[new_room]["Members"].append(name)
+                print("%s reallocated to %s" % (name, new_room))
+        elif r_type == "L":
+            if people_list[name]["Designation"] == "STAFF":
+                print("Error: Staff members cannot have accomodation!")
+            elif(people_list[name]["Designation"] == "FELLOW") and (people_list[name]["NeedsAccomodation"] == "N"):
+                print("%s opted for NO ACCOMODATION. Can't reallocate" % name)
+            else:
+                current_l_space = people_list[name]["LivingSpace"]
+                if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
+                    rooms_list[current_l_space]["Members"].remove(name)
+                    people_list[name]["LivingSpace"] = new_room
+                    rooms_list[new_room]["Members"].append(name)
+                    print("%s reallocated to %s" % name, new_room)
+
 
     def remove_person(name):
         #remove from office
@@ -149,18 +162,23 @@ Amity.add_person("Bob", "F", "Y")
 Amity.add_person("Hatty", "S")
 Amity.add_person("Shee", "F")
 
-
-# Amity.reallocate_person("Drew", "O", "Valhalla")
-
-
-print("+++++++++++++++++\n+++++++++++++")
+# print("+++++++++++++++++\n+++++++++++++")
 print(rooms_list)
 print("+++++++++++++++++\n+++++++++++++")
 print(people_list)
 
-Amity.print_room("Vale")
 
+Amity.reallocate_person("Drew", "O", "Valhalla")
+
+
+# print("+++++++++++++++++\n+++++++++++++")
+print(rooms_list)
 print("+++++++++++++++++\n+++++++++++++")
-print("+++++++++++++++++\n+++++++++++++")
-print(Amity.print_allocations())
+print(people_list)
+
+# # Amity.print_room("Vale")
+
+# # print("+++++++++++++++++\n+++++++++++++")
+# # print("+++++++++++++++++\n+++++++++++++")
+# # print(Amity.print_allocations())
 
