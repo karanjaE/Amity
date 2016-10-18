@@ -18,7 +18,7 @@ d = [
 		'Name': 'Krypton'
 	}
 ]
-h = (d[0].keys())
+h = d[0].keys()
 print(h)
 
 print(tabulate(d, headers="keys"))

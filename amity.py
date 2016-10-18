@@ -1,5 +1,7 @@
 import random
 
+from tabulate import tabulate
+
 from rooms.rooms import Office, LivingSpace
 from people.people import Fellow, Staff
 
@@ -101,12 +103,26 @@ class Amity(object):
     @staticmethod
     def print_room(name):
         print("Showing members in %s:" % name)
-        
+        print(rooms_list[name]["Members"])
+        return
 
+    @staticmethod
     def print_allocations():
-        pass
+        r_lst = rooms_list.keys()
+        allocations = {}
+        for room in r_lst:
+            if len(rooms_list[room]["Members"]) > 0:
+                allocations[room]={}
+                allocations[room]["Members"] = rooms_list[room]["Members"]
+        return allocations
 
+    @staticmethod
     def print_unallocated():
+        # unallocated = {}
+        # p_lst = people_list.keys()
+        # for person in p_lst:
+        #     if people_list[person]["OFFICE"] == "None":
+        #         unallocated[person]["OFFICE"] = "None"
         pass
 
     def load_people(filename):
@@ -135,9 +151,16 @@ Amity.add_person("Shee", "F")
 
 
 # Amity.reallocate_person("Drew", "O", "Valhalla")
-Amity.remove_person("Hatty")
+
 
 print("+++++++++++++++++\n+++++++++++++")
 print(rooms_list)
 print("+++++++++++++++++\n+++++++++++++")
 print(people_list)
+
+Amity.print_room("Vale")
+
+print("+++++++++++++++++\n+++++++++++++")
+print("+++++++++++++++++\n+++++++++++++")
+print(Amity.print_allocations())
+
