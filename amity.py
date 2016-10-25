@@ -1,7 +1,10 @@
+import os
 import random
+import sys
 
 from tabulate import tabulate
 
+from db import migration
 from rooms.rooms import Office, LivingSpace
 from people.people import Fellow, Staff
 
@@ -11,34 +14,40 @@ people_list = {}
 def generate_random_l_space():
     l_spaces = []
     r_lst = rooms_list.keys()
-    for room in r_lst:
-        if rooms_list[room]["Capacity"] > len(rooms_list[room]["Members"]):
-            if rooms_list[room]["Room Type"] == "LIVINGSPACE":
-                l_spaces.append(room)
-    return random.choice(l_spaces)
+    if len(r_lst) < 1:
+        return "None"
+    elif len(r_lst) > 1:
+        for room in r_lst:
+            if rooms_list[room]["Capacity"] > len(rooms_list[room]["Members"]):
+                if rooms_list[room]["Room Type"] == "LIVINGSPACE":
+                    l_spaces.append(room)
+        return random.choice(l_spaces)
 
 
 def generate_random_office():
     o_spaces = []
     r_lst = rooms_list.keys()
-    for room in r_lst:
-        if rooms_list[room]["Capacity"] > len(rooms_list[room]["Members"]):
-            if rooms_list[room]["Room Type"] == "OFFICE":
-                o_spaces.append(room)
-    return random.choice(o_spaces)
+    if len(r_lst) < 1:
+        return "None"
+    elif len(r_lst) > 1:
+        for room in r_lst:
+            if rooms_list[room]["Capacity"] > len(rooms_list[room]["Members"]):
+                if rooms_list[room]["Room Type"] == "OFFICE":
+                    o_spaces.append(room)
+        return random.choice(o_spaces)
 
 
 class Amity(object):
 
     @staticmethod
-    def create_room(name, r_type):
+    def create_room(name, room_type):
         rooms_list[name] = {}
-        if r_type == "O":
+        if room_type == "O":
             office_space = Office()
             rooms_list[name]["Room Type"] = office_space.r_type
             rooms_list[name]["Capacity"] = office_space.capacity
             rooms_list[name]["Members"] = []
-        elif r_type == "L":
+        elif room_type == "L":
             living_space = LivingSpace()
             rooms_list[name]["Room Type"] = living_space.r_type
             rooms_list[name]["Capacity"] = living_space.capacity
@@ -59,7 +68,8 @@ class Amity(object):
             people_list[name]["NeedsAccomodation"] = needs_acc
             people_list[name]["Office"] = random_office
             people_list[name]["LivingSpace"] = "None"
-            rooms_list[random_office]["Members"].append(name)
+            if not random_office == "None":
+                rooms_list[random_office]["Members"].append(name)
         elif designation == "F":
             fellow = Fellow()
             people_list[name]["Designation"] = fellow.designation
@@ -70,8 +80,9 @@ class Amity(object):
             elif needs_acc == "Y":
                 people_list[name]["LivingSpace"] = random_l_space
             # Add person name to room members
-            rooms_list[random_l_space]["Members"].append(name)
-            rooms_list[random_office]["Members"].append(name)
+            if not random_l_space == "None" and not random_office == "None":
+                rooms_list[random_l_space]["Members"].append(name)
+                rooms_list[random_office]["Members"].append(name)
 
         else:
             print("Error: Invalid designation")
@@ -79,15 +90,15 @@ class Amity(object):
         return
 
     @staticmethod
-    def reallocate_person(name, r_type, new_room):
-        if r_type == "O":
+    def reallocate_person(name, room_type, new_room):
+        if room_type == "O":
             current_office = people_list[name]["Office"]
             if len(rooms_list[new_room]["Members"]) < rooms_list[new_room]["Capacity"]:
                 rooms_list[current_office]["Members"].remove(name)
                 people_list[name]["Office"] = new_room
                 rooms_list[new_room]["Members"].append(name)
                 print("%s reallocated to %s" % (name, new_room))
-        elif r_type == "L":
+        elif room_type == "L":
             if people_list[name]["Designation"] == "STAFF":
                 print("Error: Staff members cannot have accomodation!")
             elif(people_list[name]["Designation"] == "FELLOW") and (people_list[name]["NeedsAccomodation"] == "N"):
@@ -98,7 +109,7 @@ class Amity(object):
                     rooms_list[current_l_space]["Members"].remove(name)
                     people_list[name]["LivingSpace"] = new_room
                     rooms_list[new_room]["Members"].append(name)
-                    print("%s reallocated to %s" % name, new_room)
+                    print("%s reallocated to %s" % (name, new_room))
 
 
     def remove_person(name):
@@ -115,8 +126,12 @@ class Amity(object):
 
     @staticmethod
     def print_room(name):
-        print("Showing members in %s:" % name)
-        print(rooms_list[name]["Members"])
+        all_rooms = rooms_list.keys()
+        if name not in all_rooms:
+            print("Error: Room doesn't exist")
+        else:
+            print("Showing members in %s:" % name)
+            print(rooms_list[name]["Members"])
         return
 
     @staticmethod
@@ -130,55 +145,74 @@ class Amity(object):
         return allocations
 
     @staticmethod
-    def print_unallocated():
-        # unallocated = {}
-        # p_lst = people_list.keys()
-        # for person in p_lst:
-        #     if people_list[person]["OFFICE"] == "None":
-        #         unallocated[person]["OFFICE"] = "None"
-        pass
+    def print_unallocated(output_file=None):
+        unallocated = {}
+        unallocated["Office Unallocated People"] = []
+        unallocated["People with no Living Space"] = []
+        people_lst = people_list.keys()
+        for name in people_lst:
+            if people_list[name]["Office"] == "None":
+                unallocated["Office Unallocated People"].append(name)
+            elif people_list[name]["LivingSpace"] == "None":
+                unallocated["People with no Living Space"].append(name)
+        return unallocated
 
+    @staticmethod
     def load_people(filename):
+        rand_office = generate_random_office()
+        rand_l_space = generate_random_l_space()
+        with open(filename) as pfile:
+            for line in pfile:
+                details = line.rstrip().split()
+                name = details[0]+" "+details[1]
+                designation = details[2]
+                people_list[name] = {}
+                if len(details) < 4:
+                    needs_acc = "N"
+                else:
+                    needs_acc = designation[3]
+
+                if designation == "STAFF":
+                    staff = Staff()
+                    people_list[name]["Designation"] = staff.designation
+                    people_list[name]["NeedsAccomodation"] = staff.needs_acc
+                    people_list[name]["Office"] = rand_office
+                    people_list[name]["LivingSpace"] = "None"
+
+                    if not people_list[name]["Office"] == "None":
+                        rooms_list[rand_office]["Members"].append(name)
+                elif designation == "FELLOW":
+                    fellow = Fellow()
+                    people_list[name]["Designation"] = fellow.designation
+                    people_list[name]["NeedsAccomodation"] = needs_acc
+                    people_list[name]["Office"] = rand_office
+                    if needs_acc == "N":
+                        people_list[name]["LivingSpace"] = "None"
+                    elif needs_acc == "Y":
+                        people_list[name]["LivingSpace"] = rand_l_space
+
+                    if not people_list[name]["Office"] == "None" and not people_list[name]["LivingSpace"] == "None":
+                        rooms_list[rand_office]["Members"].append(name)
+                        rooms_list[rand_office]["Members"].append(name)
+                    return
+
+    @staticmethod
+    def load_state(dbname='amity.db'):
         pass
+        
 
-    def load_state(dbname):
-        pass
+    def save_state(dbname=None):
+        #save people to the db.
+        for key in people_list:
+            name = key
+            needs_acc = people_list[key]["NeedsAccomodation"]
+            designation = people_list[key]["Designation"]
+            office = people_list[key]["Office"]
+            l_space = people_list[key]["LivingSpace"]
 
-    def save_state(dbname):
-        pass
-
-
-Amity.create_room("Valhalla", "O")
-Amity.create_room("Higwarts", "L")
-Amity.create_room("Jail", "L")
-Amity.create_room("Narnia", "O")
-Amity.create_room("Vale", "L")
-Amity.create_room("Mordor", "O")
-Amity.create_room("Avatar", "L")
-
-Amity.add_person("Drew", "F", "Y")
-Amity.add_person("Jay", "S")
-Amity.add_person("Bob", "F", "Y")
-Amity.add_person("Hatty", "S")
-Amity.add_person("Shee", "F")
-
-# print("+++++++++++++++++\n+++++++++++++")
-print(rooms_list)
-print("+++++++++++++++++\n+++++++++++++")
-print(people_list)
-
-
-Amity.reallocate_person("Drew", "O", "Valhalla")
-
-
-# print("+++++++++++++++++\n+++++++++++++")
-print(rooms_list)
-print("+++++++++++++++++\n+++++++++++++")
-print(people_list)
-
-# # Amity.print_room("Vale")
-
-# # print("+++++++++++++++++\n+++++++++++++")
-# # print("+++++++++++++++++\n+++++++++++++")
-# # print(Amity.print_allocations())
-
+        #Save rooms data to the db
+        for key in rooms_list:
+            name =  key
+            capacity = rooms_list[key]["Capacity"]
+            room_type = rooms_list[key]["Room Type"]
+            members = rooms_list[key]["Members"]
