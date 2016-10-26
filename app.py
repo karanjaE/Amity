@@ -26,15 +26,47 @@ import cmd
 import os
 import sys
 
+#from colorama import init
 from docopt import docopt, DocoptExit
+from termcolor import cprint 
+from pyfiglet import figlet_format
 
 import amity
 from amity import Amity
 
-from colorama import init
-init(strip=not sys.stdout.isatty()) # strip colors if stdout is redirected
-from termcolor import cprint 
-from pyfiglet import figlet_format
 
-cprint(figlet_format("Amity Room Allocator", font="bulbhead"),
-	"yellow")
+def docopt_cmd(func):
+	def fn(self, arg):
+		try:
+			opt = docopt(fn.__doc__, arg)
+		except DocoptExit as e:
+			print('Invalid command')
+			print(e)
+		except SystemExit:
+			return
+
+		return func(self, opt)
+
+	fn.__name__ = func.__name__
+	fn.__doc__ = func.__doc__
+	fn.__dict__.update(func.__dict__)
+
+	return fn
+
+class Allocator(cmd.Cmd):
+	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"), "yellow")
+	prompt = "Amity>> "
+
+	@docopt_cmd
+	def create_room(self, args):
+		"""Creates new rooms
+
+		Usage: create_room <name> <room_type>
+		"""
+		Amity.create_room(args["<name>"], args["<room_type>"])
+
+
+if __name__ == '__main__':
+	Allocator().cmdloop()
+
+

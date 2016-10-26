@@ -194,12 +194,12 @@ class Amity(object):
                     if not people_list[name]["Office"] == "None" and not people_list[name]["LivingSpace"] == "None":
                         rooms_list[rand_office]["Members"].append(name)
                         rooms_list[rand_office]["Members"].append(name)
-                    return
+            return
 
     @staticmethod
     def load_state(dbname='amity.db'):
         pass
-        
+
 
     def save_state(dbname=None):
         #save people to the db.
