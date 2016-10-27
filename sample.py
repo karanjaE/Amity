@@ -40,8 +40,8 @@ def load_people(filename):
                 if not people_list[name]["Office"] == "None" and not people_list[name]["LivingSpace"] == "None":
                 	rooms_list[rand_office]["Members"].append(name)
                 	rooms_list[rand_office]["Members"].append(name)
-                return
-    			
+        return
+
 
 def save_state(dbname=None):
 	for key in people_list:

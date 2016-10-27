@@ -28,14 +28,14 @@ import sys
 
 #from colorama import init
 from docopt import docopt, DocoptExit
-from termcolor import cprint 
+from termcolor import cprint
 from pyfiglet import figlet_format
 
 import amity
 from amity import Amity
 
 
-def docopt_cmd(func):
+def app_exec(func):
 	def fn(self, arg):
 		try:
 			opt = docopt(fn.__doc__, arg)
@@ -57,8 +57,8 @@ class Allocator(cmd.Cmd):
 	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"), "yellow")
 	prompt = "Amity>> "
 
-	@docopt_cmd
-	def create_room(self, args):
+	@app_exec
+	def do_create_room(self, args):
 		"""Creates new rooms
 
 		Usage: create_room <name> <room_type>
@@ -68,5 +68,3 @@ class Allocator(cmd.Cmd):
 
 if __name__ == '__main__':
 	Allocator().cmdloop()
-
-
