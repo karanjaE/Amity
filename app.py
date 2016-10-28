@@ -64,6 +64,7 @@ class Allocator(cmd.Cmd):
 		Usage: create_room <name> <room_type>
 		"""
 		Amity.create_room(args["<name>"], args["<room_type>"])
+	
 
 
 if __name__ == '__main__':

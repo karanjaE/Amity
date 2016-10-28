@@ -11,9 +11,13 @@ from people.people import Fellow, Staff
 rooms_list = {}
 people_list = {}
 
+
 def generate_random_l_space():
+    """Generates a random room of living space type from the available rooms.
+    """
     living_spaces = []
     r_lst = rooms_list.keys()
+
     if len(r_lst) < 1:
         return "None"
     elif len(r_lst) > 1:
@@ -25,6 +29,8 @@ def generate_random_l_space():
 
 
 def generate_random_office():
+    """Generates a random office for allocation to people being added for the
+    first time."""
     o_spaces = []
     r_lst = rooms_list.keys()
     if len(r_lst) < 1:
@@ -100,12 +106,18 @@ class Amity(object):
         """
         # Check if staff wants accomodation
         if people_list[name]["Designation"] == "STAFF" and room_type == "L":
-            return "Error: Staff members can't get acommodation"
-        elif
+            print("Error: Staff members can't get acommodation")
+        #check if the selected room has accomodation
+
+        #check if the person is a staff and wants accomodation
+
+        #check if
 
 
     @staticmethod
     def print_room(name):
+        """Prints all the people in a given room.
+        """
         all_rooms = rooms_list.keys()
         if name not in all_rooms:
             print("Error: Room doesn't exist")
@@ -156,7 +168,8 @@ class Amity(object):
                     people_list[name]["LivingSpace"] = generate_random_l_space()
                 else:
                     people_list[name]["LivingSpace"] = "None"
-                if not people_list[name]["LivingSpace"] == "None" and not people_list[name]["Office"] == "None":
+                if not people_list[name]["LivingSpace"] == "None" \
+                and not people_list[name]["Office"] == "None":
                     rooms_list[people_list[name]["LivingSpace"]]["Members"].append(name)
                     rooms_list[people_list[name]["Office"]]["Members"].append(name)
             return
@@ -165,6 +178,6 @@ class Amity(object):
     def load_state(dbname='amity.db'):
         pass
 
-
+    @staticmethod
     def save_state(dbname=None):
         pass
