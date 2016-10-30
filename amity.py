@@ -40,11 +40,15 @@ def generate_random_office():
 
 
 class Amity(object):
-    """The class holds the system's entire functionality"""
+    """
+    The class holds the system's entire functionality
+    """
 
     @staticmethod
     def create_room(name, room_type):
-        """Create a new room by declaring it's name and type"""
+        """
+        Create a new room by declaring it's name and type
+        """
         rooms = rooms_list.keys()
         if name not in rooms:
             if room_type == "O":
@@ -68,7 +72,8 @@ class Amity(object):
 
     @staticmethod
     def add_person(fname, lname, designation, needs_acc="N"):
-        """Add a new person and alocate them a random office, and if they are a
+        """
+        Add a new person and alocate them a random office, and if they are a
         fellow and have opted for accomodation, allocate them a random living
         space"""
         name = fname + " " + lname
@@ -104,16 +109,16 @@ class Amity(object):
 
     @staticmethod
     def reallocate_person(name, room_type, new_room):
-        """Moves a person from one room to another
+        """
+        Moves a person from one room to another
         """
         current_office = people_list[name]["Office"]
         current_l_space = people_list[name]["LivingSpace"]
         # Check if staff wants accomodation
         if people_list[name]["Designation"] == "STAFF" and room_type == "L":
             print("Error: Staff members can't get acommodation")
-        #check if the selected room has accomodation
-        elif len(rooms_list[new_room]["Members"]) >= \
-        rooms_list[new_room]["Capacity"]:
+        # check if the selected room has accomodation
+        elif len(rooms_list[new_room]["Members"]) >= rooms_list[new_room]["Capacity"]:
             print("Error: The room you selected is already full")
         # check if the person is a staff and wants accomodation
         elif people_list[name]["Designation"] == "STAFF" and room_type == "L":
@@ -126,7 +131,7 @@ class Amity(object):
                 if people_list[name]["NeedsAccomodation"] == "Y":
                     people_list[name]["LivingSpace"] = new_room
                     rooms_list[new_room]["Members"].append(name)
-        #remove the person form the current list::
+        # remove the person form the current list::
         if not current_office == "None":
             rooms_list[current_office]["Members"].remove(name)
         elif not current_l_space == "None":
@@ -135,7 +140,8 @@ class Amity(object):
 
     @staticmethod
     def print_room(name):
-        """Prints all the people in a given room.
+        """
+        Prints all the people in a given room.
         """
         all_rooms = rooms_list.keys()
         if name not in all_rooms:
@@ -147,16 +153,22 @@ class Amity(object):
 
     @staticmethod
     def print_allocations():
+        """
+        Outpurs all the rooms that have people in them as well as the
+        members in those rooms"""
         r_lst = rooms_list.keys()
         allocations = {}
         for room in r_lst:
             if len(rooms_list[room]["Members"]) > 0:
-                allocations[room]={}
+                allocations[room] = {}
                 allocations[room]["Members"] = rooms_list[room]["Members"]
         return allocations
 
     @staticmethod
     def print_unallocated(output_file=None):
+        """
+        Outputs all the people to whom no room has been allocated.
+        """
         unallocated = {}
         unallocated["Office Unallocated People"] = []
         unallocated["People with no Living Space"] = []
@@ -170,6 +182,10 @@ class Amity(object):
 
     @staticmethod
     def load_people(filename):
+        """
+        adds prople from a text file into the app and allocated rooms to
+        them if any are available
+        """
         with open(filename, 'r') as people:
             for line in people:
                 details = line.rstrip().split()
@@ -187,16 +203,22 @@ class Amity(object):
                     people_list[name]["LivingSpace"] = generate_random_l_space()
                 else:
                     people_list[name]["LivingSpace"] = "None"
-                if not people_list[name]["LivingSpace"] == "None" \
-                and not people_list[name]["Office"] == "None":
+                if not people_list[name]["LivingSpace"] == "None" and not people_list[name]["Office"] == "None":
                     rooms_list[people_list[name]["LivingSpace"]]["Members"].append(name)
                     rooms_list[people_list[name]["Office"]]["Members"].append(name)
             return
 
     @staticmethod
     def load_state(dbname='amity.db'):
-        
+        """
+        Loads the specified database's contents into the app.
+        """
+        pass
 
     @staticmethod
     def save_state(dbname="main.db"):
+        """
+        Saves data stored in the application into the specified database. If
+        no db is selected, it stores it in the default db.
+        """
         pass

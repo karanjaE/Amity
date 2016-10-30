@@ -10,7 +10,7 @@ Usage:
 	amity print_allocations [-o=filename]
 	amity print_unallocated [-o=filename]
 	amity load_people <filename>
-	amity load_state [--db=dbname]	
+	amity load_state [--db=dbname]
 	amity save_state [--db=dbname]
 	amity -i|--interactive
 	amity -h|--help
@@ -53,7 +53,7 @@ def app_exec(func):
 
 class Allocator(cmd.Cmd):
 	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"),\
-	 "yellow")
+	"yellow")
 	prompt = "Amity>> "
 
 	@app_exec
@@ -77,39 +77,34 @@ class Allocator(cmd.Cmd):
 			args["<designation>"])
 		except:
 			print("Sorry; please check your input and try again.")
-	
+
 	@app_exec
 	def do_reallocate_person(self, args):
-    	pass
-	
+		pass
+
 	@app_exec
 	def do_print_room(self, args):
-    	pass
-	
+		pass
+
 	@app_exec
 	def do_print_allocations(self, args):
-    	pass
+		pass
 
 	@app_exec
 	def do_print_unallocated(self, args):
-    	pass
-	
+		pass
+
 	@app_exec
 	def do_load_people(self, args):
-    	pass
-	
+		pass
+
 	@app_exec
 	def do_load_state(self, args):
-    	pass
-	
+		pass
+
 	@app_exec
 	def do_save_state(self, args):
-    	pass
-
-
-
-
-
+		pass
 
 
 if __name__ == '__main__':
