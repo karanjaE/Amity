@@ -1,10 +1,6 @@
-import os
 import random
-import sys
 
-from tabulate import tabulate
-
-from db import migration
+from db.migration import Person, Room
 from rooms.rooms import Office, LivingSpace
 from people.people import Fellow, Staff
 
@@ -44,9 +40,11 @@ def generate_random_office():
 
 
 class Amity(object):
+    """The class holds the system's entire functionality"""
 
     @staticmethod
     def create_room(name, room_type):
+        """Create a new room by declaring it's name and type"""
         rooms = rooms_list.keys()
         if name not in rooms:
             if room_type == "O":
@@ -69,7 +67,11 @@ class Amity(object):
         return
 
     @staticmethod
-    def add_person(name, designation, needs_acc="N"):
+    def add_person(fname, lname, designation, needs_acc="N"):
+        """Add a new person and alocate them a random office, and if they are a
+        fellow and have opted for accomodation, allocate them a random living
+        space"""
+        name = fname + " " + lname
         people_list[name] = {}
         random_office = generate_random_office()
         random_l_space = generate_random_l_space()
@@ -104,15 +106,32 @@ class Amity(object):
     def reallocate_person(name, room_type, new_room):
         """Moves a person from one room to another
         """
+        current_office = people_list[name]["Office"]
+        current_l_space = people_list[name]["LivingSpace"]
         # Check if staff wants accomodation
         if people_list[name]["Designation"] == "STAFF" and room_type == "L":
             print("Error: Staff members can't get acommodation")
         #check if the selected room has accomodation
-
-        #check if the person is a staff and wants accomodation
-
-        #check if
-
+        elif len(rooms_list[new_room]["Members"]) >= \
+        rooms_list[new_room]["Capacity"]:
+            print("Error: The room you selected is already full")
+        # check if the person is a staff and wants accomodation
+        elif people_list[name]["Designation"] == "STAFF" and room_type == "L":
+            print("A staff member cannot get accomodation")
+        else:
+            if room_type == "O":
+                people_list[name]["Office"] = new_room
+                rooms_list[new_room]["Members"].append(name)
+            elif room_type == "L":
+                if people_list[name]["NeedsAccomodation"] == "Y":
+                    people_list[name]["LivingSpace"] = new_room
+                    rooms_list[new_room]["Members"].append(name)
+        #remove the person form the current list::
+        if not current_office == "None":
+            rooms_list[current_office]["Members"].remove(name)
+        elif not current_l_space == "None":
+            rooms_list[current_l_space]["Members"].remove(name)
+        return
 
     @staticmethod
     def print_room(name):
@@ -179,5 +198,5 @@ class Amity(object):
         pass
 
     @staticmethod
-    def save_state(dbname=None):
+    def save_state(dbname="main.db"):
         pass
