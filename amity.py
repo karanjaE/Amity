@@ -195,7 +195,7 @@ class Amity(object):
 
     @staticmethod
     def load_state(dbname='amity.db'):
-        pass
+        
 
     @staticmethod
     def save_state(dbname="main.db"):
