@@ -1,3 +1,6 @@
+"""This module defines the base properties of people classes. Amity will inherit
+from it while performing the apps main functionalities
+"""
 class Person(object):
     def __init__(self, designation=None, needs_acc="N"):
         self.designation = designation
