@@ -30,5 +30,5 @@ class Room(Base):
 	capacity = Column(Integer, nullable=False)
 	members = Column(Text)
 
-engine = create_engine('sqlite:///db/amity.db')
+engine = create_engine('sqlite:///db/main.db')
 Base.metadata.create_all(engine)

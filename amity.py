@@ -154,7 +154,7 @@ class Amity(object):
     @staticmethod
     def print_allocations():
         """
-        Outpurs all the rooms that have people in them as well as the
+        Outputs all the rooms that have people in them as well as the
         members in those rooms"""
         r_lst = rooms_list.keys()
         allocations = {}
@@ -221,4 +221,16 @@ class Amity(object):
         Saves data stored in the application into the specified database. If
         no db is selected, it stores it in the default db.
         """
-        pass
+        # add people data into db.
+        for person in people_list:
+            Person.name = person
+            Person.designation = people_list[person]["Designation"]
+            Person.needs_ac = people_list[person]["NeedsAccomodation"]
+            Person.office = people_list[person]["Office"]
+            Person.l_space = people_list[person]["LivingSpace"]
+
+        for room in rooms_list:
+            Room.name = room
+            Room.r_type = rooms_list[room]["Room Type"]
+            Room.capacity = rooms_list[room]["Capacity"]
+            Room.members = rooms_list[room]["Members"]
