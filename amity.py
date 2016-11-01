@@ -95,18 +95,19 @@ class Amity(object):
         last_name = last_name.upper()
         full_name = first_name + " " + last_name
         needs_accomodation = needs_accomodation.upper()
+        needs = ["Y", "N"]
         designation = designation.upper()
         designations = ["S", "s", "F", "f"]
         office = Amity.generate_random_office()
         living_space = Amity.generate_random_living_space()
-        if len(first_name) == 0 or len(last_name) == 0\
-         or len(designation) == 0:
-             print("Please ensure all values are entered")
+        if len(first_name) == 0 or len(last_name) == 0 \
+        or len(designation) == 0:
+            print("Please ensure all values are entered")
         elif not first_name.isalpha() or not last_name.isalpha():
             print("Names can only contain alphabets")
         elif designation not in designations:
             print("Please enter 'F' for fellow or 'S' for staff!")
-        elif needs_accomodation != "Y" or needs_accomodation != "N":
+        elif needs_accomodation not in needs:
             print("Needs Accomodation can only be Y or N")
         elif designation == "S" and needs_accomodation == "Y":
             print("Stop! Staff members can't opt in for accomodation!")
@@ -150,31 +151,77 @@ class Amity(object):
             opt = input("Deletes are irreversible. \n Are you sure?Y/N ").upper()
             if opt == "N":
                 print("Phewks! I thought you were serious.")
-            elif opt = "Y":
+            elif opt == "Y":
                 current_office = Amity.people_list[name]["Office"]
                 current_living_space = Amity.people_list[name]["LivingSpace"]
-                del people_list[name]
-                Amity.rooms_list[current_office]["Members"].remove(name)
-                Amity.rooms_list[current_living_space]["Members"].remove(name)
+                del Amity.people_list[name]
+                if not current_office == "None":
+                    Amity.rooms_list[current_office]["Members"].remove(name)
+                elif not current_living_space == "None":
+                    Amity.rooms_list[current_living_space]["Members"].remove(name)
                 print("%s successfully removed." % name)
             else:
                 print("Invalid option")
-        
+
+        return
 
     @staticmethod
     def reallocate_person(name, room_type, new_room):
         """Moves a person to another room of their choice"""
-        pass
+        name = name.upper()
+        room_type = room_type.upper()
+        new_room = new_room.upper()
+        room_types = ["L", "l", "O", "o"]
+        if name not in Amity.people_list.keys():
+            print("%s does not exist."%name)
+        elif new_room not in Amity.rooms_list.keys():
+            print("Room %s does not exist." % new_room)
+        elif room_type not in room_types:
+            print("Please select a valid room type(L or O)")
+        elif len(Amity.rooms_list[new_room]["Members"]) >= \
+        Amity.rooms_list[new_room]["Capacity"]:
+            print("Sorry. %s  is already full" % new_room)
+        elif Amity.people_list[name]["NeedsAccomodation"] == "NO" and room_type == "L":
+            print("%s cannot get accomodation" % name)
+        else:
+            current_office = Amity.people_list[name]["Office"]
+            current_living_space = Amity.people_list[name]["LivingSpace"]
+            if room_type == "L":
+                Amity.people_list[name]["LivingSpace"] = new_room
+                Amity.rooms_list[new_room]["Members"].append(name)
+                if current_living_space != "None":
+                    Amity.rooms_list[current_living_space]["Members"].remove(name)
+                print("%s successfully moved" % name)
+            elif room_type == "O":
+                Amity.people_list[name]["Office"] = new_room
+                Amity.rooms_list[new_room]["Members"].append(name)
+                if current_office != "None":
+                    Amity.rooms_list[current_office]["Members"].remove(name)
+                print("%s successfully moved" % name)
 
     @staticmethod
     def print_unallocated():
         """Prints all the people who have no rooms"""
-        pass
+        no_offices= []
+        no_living_space = []
+        for person in Amity.people_list.keys():
+            if Amity.people_list[person]["Office"] == "None":
+                no_offices.append(person)
+            if Amity.people_list[person]["Designation"] == "FELLOW" and \
+            Amity.people_list[person]["LivingSpace"] == "None":
+                no_living_space.append(person)
+        print("People with no offices \n", no_offices)
+        print("People with no LivingSpace \n", no_living_space)
+        return
 
     @staticmethod
     def print_allocations():
         """Prints all the rooms and their members"""
-        pass
+        print("All allocations \n++++++++++++++++")
+        for room in Amity.rooms_list.keys():
+            if len(Amity.rooms_list[room]["Members"]) > 0:
+                print(room + Amity.rooms_list[room]["Members"])
+        return
 
     @staticmethod
     def load_people(filename):
