@@ -97,7 +97,7 @@ class Amity(object):
         needs_accomodation = needs_accomodation.upper()
         needs = ["Y", "N"]
         designation = designation.upper()
-        designations = ["S", "s", "F", "f"]
+        designations = ["S", "STAFF", "s", "F", "FELLOW", "f"]
         office = Amity.generate_random_office()
         living_space = Amity.generate_random_living_space()
         if len(first_name) == 0 or len(last_name) == 0 \
@@ -106,12 +106,13 @@ class Amity(object):
         elif not first_name.isalpha() or not last_name.isalpha():
             print("Names can only contain alphabets")
         elif designation not in designations:
-            print("Please enter 'F' for fellow or 'S' for staff!")
+            print("Please enter 'F'/'FELLOW' or 'S'/'STAFF' for staff!")
         elif needs_accomodation not in needs:
             print("Needs Accomodation can only be Y or N")
-        elif designation == "S" and needs_accomodation == "Y":
+        elif designation == "S" or designation == "STAFF" \
+        and needs_accomodation == "Y":
             print("Stop! Staff members can't opt in for accomodation!")
-        elif designation == "S":
+        elif designation == "S" or designation == "STAFF":
             new_person = Staff()
             Amity.people_list[full_name] = {}
             Amity.people_list[full_name]["Designation"] = new_person.designation
@@ -121,7 +122,7 @@ class Amity(object):
             if office != "None":
                 Amity.rooms_list[office]["Members"].append(full_name)
             print("%s successfully added." % full_name)
-        elif designation == "F":
+        elif designation == "F" or designation == "FELLOW":
             new_person = Fellow()
             Amity.people_list[full_name] = {}
             Amity.people_list[full_name]["Designation"] = new_person.designation
@@ -137,7 +138,7 @@ class Amity(object):
                     Amity.rooms_list[office]["Members"].append(full_name)
                 if living_space != "None":
                     Amity.rooms_list[living_space]["Members"].append(full_name)
-                print("%s successfully added." % full_name)
+            print("%s successfully added." % full_name)
 
         return
 
@@ -217,25 +218,39 @@ class Amity(object):
     @staticmethod
     def print_allocations():
         """Prints all the rooms and their members"""
-        print("All allocations \n++++++++++++++++")
+        # print("All allocations \n++++++++++++++++")
         for room in Amity.rooms_list.keys():
             if len(Amity.rooms_list[room]["Members"]) > 0:
-                print(room + Amity.rooms_list[room]["Members"])
+                print(room)
+                print(Amity.rooms_list[room]["Members"])
         return
 
     @staticmethod
     def load_people(filename):
         """Loads people from a text file into the app"""
-        pass
+        with open(filename, "r") as people:
+            for person in people:
+                details = person.rstrip().split()
+                first_name = details[0].upper()
+                last_name = details[1].upper()
+                full_name = first_name + " " + last_name
+                designation = details[2].upper()
+                needs_ac = "N"
+                if len(person) == 4:
+                    needs_ac = details[3]
+                elif len(person) < 4:
+                    needs_ac = "N"
+                Amity.add_person(first_name, last_name, designation, needs_ac)
+        return
 
     @staticmethod
-    def load_state(filename):
+    def load_state(filename="main.db"):
         """loads data from a specified filename and defaults to the default
         db if none is selected"""
         pass
 
     @staticmethod
-    def save_state(filename):
+    def save_state(filename="main.db"):
         """persists app data to a specified db and defaults to def-db if None
         is selected"""
         pass
