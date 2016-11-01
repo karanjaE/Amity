@@ -9,14 +9,12 @@ from app import Amity
 
 
 class TestAmity(TestCase):
-    def setUp(self):
-        self.amity = Amity()
 
     def test_create_room(self):
         """Checks that a room is successfully created and added to the existing
         rooms_list
         """
-        pass
+        self.assertEqual(Amity.create_room('nam3', 'l'), msg=)
 
     def test_if_error_is_thrown_if_non_alphabet_is_passed_on_room_name(self):
         """Checks that all the characters in the room name is not a string

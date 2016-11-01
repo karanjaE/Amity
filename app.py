@@ -12,7 +12,7 @@ Usage:
 	print_allocations
 	print_unallocated
 	load_state [<filename>]
-	save_state [<filename>]
+	save_state [<db_name>]
 	(-i | --interactive)
 Options:
 	-h --help Show this screen.
@@ -77,7 +77,7 @@ class AmityApp(cmd.Cmd):
 		"""
 		try:
 			Amity.add_person(arg["<first_name>"], arg["<last_name>"], \
-					arg["<designation>"], arg["[<needs_accomodation>]"])
+					arg["<designation>"], arg["<needs_accomodation>"])
 		except:
 			print("An error occured")
 
@@ -127,15 +127,15 @@ class AmityApp(cmd.Cmd):
 		Loads data from the specified db into the app.
 		Usage: load_state
 		"""
-		Amity.load_state()
+		Amity.load_state(arg["<filename>"])
 
 	@app_exec
 	def do_save_state(self, arg):
 		"""
 		Persists app data into the given db
-		Usage: save_state
+		Usage: save_state [<db_name>]
 		"""
-		Amity.save_state()
+		Amity.save_state(arg["<db_name>"])
 
 
 if __name__ == '__main__':

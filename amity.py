@@ -1,7 +1,12 @@
+import os
 import random
 
 from tabulate import tabulate
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from db.migration import Base, Person, Room, DatabaseCreator
 from people.people import Fellow, Staff
 from rooms.rooms import LivingSpace, Office
 
@@ -247,10 +252,34 @@ class Amity(object):
     def load_state(filename="main.db"):
         """loads data from a specified filename and defaults to the default
         db if none is selected"""
+
         pass
 
     @staticmethod
-    def save_state(filename="main.db"):
+    def save_state(db_name=None):
         """persists app data to a specified db and defaults to def-db if None
         is selected"""
-        pass
+        if not db_name:
+            db = DatabaseCreator()
+        else:
+            db = DatabaseCreator(db_name)
+        Base.metadata.bind = db.engine
+        s = db.session()
+        for room in Amity.rooms_list.keys():
+            room_to_db = Room(
+                name = room,
+                r_type = Amity.rooms_list[room]['Type'],
+                capacity = Amity.rooms_list[room]['Capacity'],
+                # members = ",".join(Amity[room]["members"])
+            )
+        for person in Amity.people_list.keys():
+            people_to_db = Person(
+                name = person,
+                designation = Amity.people_list[person]["Designation"],
+                needs_ac = Amity.people_list[person]["NeedsAccomodation"],
+                office = Amity.people_list[person]["Office"],
+                l_space = Amity.people_list[person]["LivingSpace"],
+            )
+        s.add(room_to_db)
+        s.add(people_to_db)
+        s.commit()

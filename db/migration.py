@@ -3,7 +3,7 @@ import sys
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 
 Base = declarative_base()
@@ -30,5 +30,18 @@ class Room(Base):
 	capacity = Column(Integer, nullable=False)
 	members = Column(Text)
 
-engine = create_engine('sqlite:///db/main.db')
-Base.metadata.create_all(engine)
+class DatabaseCreator(object):
+    """
+    Creates a db connection object
+    """
+
+    def __init__(self, db_name=None):
+        self.db_name = db_name
+        if self.db_name:
+            self.db_name = db_name + '.sqlite'
+        else:
+            self.db_name = 'main.sqlite'
+        self.engine = create_engine('sqlite:///' + self.db_name)
+        self.session = sessionmaker()
+        self.session.configure(bind=self.engine)
+        Base.metadata.create_all(self.engine)
