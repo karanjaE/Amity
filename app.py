@@ -1,45 +1,46 @@
-"""Amity Allocator
-This app enables allocation of offices and living spaces at Amity
-
+#!/usr/bin/env python
+"""
+Amity Allocator
+This system makes it easy to manage rooms and people at Amity.
 Usage:
-	amity create_room <name> <room_type>
-	amity add_person <fname> <lname> <designation> [--needs_acc=N]
-	amity reallocate_person <name> <room_type> <new_room>
-	amity remove_person <name>
-	amity print_room <name>
-	amity print_allocations [-o=filename]
-	amity print_unallocated [-o=filename]
-	amity load_people <filename>
-	amity load_state [--db=dbname]
-	amity save_state [--db=dbname]
-	amity -i|--interactive
-	amity -h|--help
-	amity -v|--version
-
+	create_room <room_name> <room_type>
+	add_person <first_name> <last_name> <designation> [<needs_accomodation>]
+	print_room <room_name>
+	reallocate_person <name> <room_type> <new_room>
+	remove_person <name>
+	load_people <filename>
+	print_allocations
+	print_unallocated
+	load_state [<filename>]
+	save_state [<filename>]
+	(-i | --interactive)
 Options:
-	-o		outputs the results to a file
-	--db 	specifies the database to read from or write to
-	-h|--help displays help message
-	-i|--interactive opens the app in interactive mode
+	-h --help Show this screen.
+	-i --interactive Interactive mode.
+	-v --version
 """
 import cmd
-import os
-import sys
 
 from docopt import docopt, DocoptExit
-from termcolor import cprint
 from pyfiglet import figlet_format
+from termcolor import cprint
 
-import amity
 from amity import Amity
 
+
 def app_exec(func):
+	"""
+	Decorator definition for the app.
+	"""
 	def fn(self, arg):
 		try:
 			opt = docopt(fn.__doc__, arg)
 		except DocoptExit as e:
-			print('Sorry, wrong command.\nPlease try again')
+			msg = "Oops! Invalid command"
+			print(msg)
 			print(e)
+			return
+
 		except SystemExit:
 			return
 
@@ -51,78 +52,91 @@ def app_exec(func):
 
 	return fn
 
-class Allocator(cmd.Cmd):
-	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"), "yellow")
-	prompt = "Amity>> "
+
+class AmityApp(cmd.Cmd):
+	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"),\
+				"yellow")
+	prompt = "Amity -->"
 
 	@app_exec
-	def do_create_room(self, args):
-		"""Creates new rooms
-
-		Usage: create_room <name> <room_type>
+	def do_create_room(self, arg):
+		"""
+		Creates a new room
+		Usage: create_room <room_name> <room_type>
 		"""
 		try:
-			Amity.create_room(args["<name>"], args["<room_type>"])
-			print("Success! Room successfully created")
+			Amity.create_room(arg["<room_name>"], arg["<room_type>"])
 		except:
-			print("An error occurred. Please check your input and try again")
+			print("An error occured")
 
 	@app_exec
-	def do_add_person(self, args):
-		"""Adds a new person and allocates them a random office and LivingSpace
-		Usage: add_person <fname> <lname> <designation> [--needs_acc=N]
+	def do_add_person(self, arg):
+		"""
+		Adds a person and allocates rooms if available
+		Usage: add_person <first_name> <last_name> <designation> [<needs_accomodation>]
 		"""
 		try:
-			Amity.add_person(args["<fname>"], args["<lname>"], args["<designation>"])
+			Amity.add_person(arg["<first_name>"], arg["<last_name>"], \
+					arg["<designation>"], arg["[<needs_accomodation>]"])
 		except:
-			print("Sorry; please check your input and try again.")
+			print("An error occured")
 
 	@app_exec
-	def do_reallocate_person(self, args):
-		pass
-
-	@app_exec
-	def do_print_room(self, args):
-		"""Prints people in a room.
-		Usage: print_room <name>
+	def do_remove_person(self, arg):
 		"""
-		try:
-			Amity.print_room(args["<name>"])
-		except:
-			print("Sorry. An error occurred. Please try again.")
-
-	@app_exec
-	def do_print_allocations(self, args):
-		"""Prints all the people to whom rooms have been allocated
-		Usage: print_allocations[-o=filename]
+		Removes person from the system
+		Usage: remove_person <name>
 		"""
-		try:
-			Amity.print_allocations(args["[-o=filename]"])
-		except:
-			print("Failed. Please try again.")
+		Amity.remove_person(arg["<name>"])
 
 	@app_exec
-	def do_print_unallocated(self, args):
-		pass
+	def do_print_room(self, arg):
+		"""
+		Prints all the people in a given rooms
+		Usage: print_room <room_name>
+		"""
+		Amity.print_room(arg["<room_name>"])
 
 	@app_exec
-	def do_load_people(self, args):
-		"""Loads people from a txt file and allocates rooms if available.
+	def do_print_allocations(self, arg):
+		"""
+		Prints all rooms and the people in them.
+		Usage: print_allocations
+		"""
+		Amity.print_allocations()
+
+	@app_exec
+	def do_print_unallocated(self, arg):
+		"""
+		Prints all the people that don't have relevant rooms
+		Usage: print_unallocated
+		"""
+		Amity.print_unallocated()
+
+	@app_exec
+	def do_load_people(self, arg):
+		"""
+		Loads people from a text file to the app.
 		Usage: load_people <filename>
 		"""
-		try:
-			Amity.load_people(args["<filename>"])
-		except:
-			print("Sorry. Please try again")
+		Amity.load_people(arg["<filename>"])
 
 	@app_exec
-	def do_load_state(self, args):
-		pass
+	def do_load_state(self, arg):
+		"""
+		Loads data from the specified db into the app.
+		Usage: load_state
+		"""
+		Amity.load_state()
 
 	@app_exec
-	def do_save_state(self, args):
-		pass
+	def do_save_state(self, arg):
+		"""
+		Persists app data into the given db
+		Usage: save_state
+		"""
+		Amity.save_state()
 
 
 if __name__ == '__main__':
-	Allocator().cmdloop()
+	AmityApp().cmdloop()
