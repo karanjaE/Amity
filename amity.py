@@ -26,13 +26,22 @@ class Amity:
             print("Room name can only contain alphabets. Try again")
         elif room_name in Amity.room_list:
             print("Dang! Name already taken. Enter another")
-        else:
-            new_room = {}
-            new_room["Name"] = room_name
+            # new_room = {}
+            # new_room["Name"] = room_name
+        if room_type.upper() == 'O':
+            room = Office(room_name)
+            Amity.room_list.append(room)
+        elif room_type.upper() == 'L':
+            room = LivingSpace(room_name)
+            Amity.room_list.append(room)
+
 
     @staticmethod
     def generate_random_room(room_type):
         """Generates a random room of the given type."""
+        # if room_type == "l".upper():
+        #     return ([room for room in Amity.room_list if room.r_type == "LIVINGSPACE"] \
+        #     or "None")
         pass
 
     @staticmethod
@@ -79,3 +88,12 @@ class Amity:
     def save_state():
         """Persists data saved in the app to a db"""
         pass
+
+
+Amity.create_room('Lime', 'O')
+Amity.create_room('Occulus', 'L')
+Amity.create_room('Kryptom', 'l')
+print(Amity.room_list)
+print(Amity.room_list)
+for room in Amity.room_list:
+    print(room.capacity)
