@@ -13,8 +13,9 @@ class Person(Base):
 	"""
 	__tablename__ = 'person'
 	id = Column(Integer, primary_key=True, autoincrement=True)
-	name = Column(String, nullable=False)
-	needs_ac = Column(String)
+	first_name = Column(String, nullable=False)
+	last_name = Column(String, nullable=False)
+	accomodated = Column(String)
 	designation = Column(String, nullable=False)
 	office = Column(String, nullable=False)
 	l_space = Column(String)
@@ -28,7 +29,7 @@ class Room(Base):
 	name = Column(String, nullable=False)
 	r_type = Column(String, nullable=False)
 	capacity = Column(Integer, nullable=False)
-	members = Column(Text)
+	members = Column(Integer)
 
 class DatabaseCreator(object):
     """

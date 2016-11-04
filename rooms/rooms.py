@@ -4,7 +4,7 @@ class Room(object):
         self.r_name = r_name
         self.r_type = r_type
         self.capacity = capacity
-        self.occupants = []
+        self.occupants = 0
 
 
 class Office(Room):
