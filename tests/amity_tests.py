@@ -5,12 +5,13 @@ import os
 from mock import patch
 from unittest import TestCase
 
-from amity import Amity
+from amity import *
+# from db.migration import Base, Person, Room, DatabaseCreator
+# from person.person import Fellow, Staff
+# from room.room import LivingSpace, Office
 
 
 class TestAmity(TestCase):
     """Test Amity functionality"""
-    def test_create_room(self):
-        """Checks that rooms are created"""
-        self.assertEqual(type(Amity.people_list), list)
-        
+    def test_if_create_room_receives_arguments(self):
+        pass

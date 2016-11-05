@@ -7,7 +7,7 @@ from tabulate import tabulate
 
 from db.migration import Base, Person, Room, DatabaseCreator
 from person.person import Fellow, Staff
-from rooms.rooms import LivingSpace, Office
+from room.room import LivingSpace, Office
 
 
 class Amity:
@@ -20,31 +20,36 @@ class Amity:
         if room_type.upper() not in ["L", "O"]:
             print("Dang!: Invalid room type entered. Use either O or L")
         elif not room_type or not room_name:
-            print("Make sure you enter all details. See help for more")
+            print("Make sure you enter a room name and room type.")
         elif not room_name.isalpha():
             print("Room name can only contain alphabets. Try again")
-        elif room_name.upper() in [room.r_name for room in Amity.room_list]:
+        elif room_name.upper() in [room["name"] for room in Amity.room_list]:
             print("Dang! Name already taken. Enter another")
+        else:
+            office = Office()
+            l_space = LivingSpace()
+            new_room = {}
+            new_room["name"] = room_name.upper()
+            new_room["occupants"] = 0
+            if room_type.upper() in ['O', "OFFICE"]:
+                new_room["type"] = office.r_type
+                new_room["capacity"] = office.capacity
+            elif room_type.upper() in ["L", "LIVINGSPACE"]:
+                new_room["type"] = l_space.r_type
+                new_room["capacity"] = l_space.capacity
 
-        if room_type.upper() == 'O':
-            room = Office(room_name.upper())
-            Amity.room_list.append(room)
-        elif room_type.upper() == 'L':
-            room = LivingSpace(room_name.upper())
-            Amity.room_list.append(room)
+            Amity.room_list.append(new_room)
 
     @staticmethod
     def generate_random_room(room_type):
         """Generates a random room of the given type."""
         if room_type.upper() == 'L':
             # print(Amity.room_list)
-            rooms = [room for room in Amity.room_list
-                     if room.r_type == "LIVINGSPACE"
-                     and room.occupants < room.capacity]
-        elif room_type.upper() == "O".upper():
-            rooms = [room for room in Amity.room_list
-                     if room.r_type == "OFFICE"
-                     and room.occupants < room.capacity]
+            rooms = [room["name"] for room in Amity.room_list
+                     if room["type"] == "LIVINGSPACE"]
+        elif room_type.upper() == "O":
+            rooms = [room["name"] for room in Amity.room_list
+                     if room["type"] == "OFFICE"]
 
         if len(rooms) > 0:
             return random.choice(rooms)
@@ -63,31 +68,18 @@ class Amity:
         elif (designation.upper() in ["S", "STAFF"] and
               needs_accomodation.upper() in ["Y", "YES"]):
             print("Staff members cannot get accomodation!")
-        # add person after passing checks/
-        allocated_office = Amity.generate_random_room("O")
-        allocated_lspace = Amity.generate_random_room("L")
-        if designation.upper() in ["S", "STAFF"]:
-            new_person = Staff(first_name, last_name)
-            new_person.accomodation = needs_accomodation
-            new_person.office = allocated_office
-            new_person.living_space = "None"
-            Amity.people_list.append(new_person)
-            if allocated_office != "None":
-                allocated_office.occupants += 1
-        elif designation.upper() in ["F", "FELLOW"]:
-            new_person = Fellow(first_name, last_name)
-            new_person.accomodation = needs_accomodation
-            new_person.office = allocated_office
-            if allocated_office != "None":
-                allocated_office.occupants += 1
-            if needs_accomodation.upper() in ["Y, YES"]:
-                new_person.living_space = allocated_lspace
-                if allocated_lspace != "None":
-                    allocated_lspace.occupants += 1
-            else:
-                new_person.living_space = "None"
+        else:
+            allocated_office = Amity.generate_random_room("O")
+            allocated_lspace = Amity.generate_random_room("L")
+            new_person = {}
+            new_person["first_name"] = first_name
+            new_person["last_name"] = last_name
+            new_person["accomodated"] = needs_accomodation
+            new_person["office"] = allocated_office
+            if designation.upper() in ["F", "FELLOW"]:
+                new_person["designation"] = Fellow.designation
+                
 
-            Amity.people_list.append(new_person)
 
     @staticmethod
     def load_people(filename):
@@ -150,16 +142,13 @@ class Amity:
             db = DatabaseCreator(db_name)
         Base.metadata.bind = db.engine
         s = db.session()
-        for room in Amity.room_list:
+        for room in Amity.rooms_list:
             rooms_to_save = Room(
                 name=room.r_name,
                 r_type=room.r_type,
                 capacity=room.capacity,
-                members=room.occupants
+                members=room.members
             )
-            s.add(rooms_to_save)
-            s.commit()
-
         for person in Amity.people_list:
             people_to_save = Person(
                 first_name=person.first_name,
@@ -169,5 +158,3 @@ class Amity:
                 office=person.office,
                 l_space=person.living_space
             )
-            s.add(people_to_save)
-            s.commit()
