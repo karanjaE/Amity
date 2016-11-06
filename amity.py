@@ -174,12 +174,32 @@ class Amity:
                     print(member)
 
     @staticmethod
-    def load_state(dbname=None):
+    def load_state(dbname):
         """Loads data from a DB file into the app."""
-        if not dbname:
-            print("You must select a database to load!")
-        else:
-            pass
+        engine = create_engine("sqlite:///" + dbname + ".sqlite")
+        Session = sessionmaker()
+        Session.configure(bind=engine)
+        session = Session()
+        people = session.query(Person).all()
+        rooms = session.query(Room).all()
+
+        for room in rooms:
+            loaded_room = {}
+            loaded_room["name"] = room.name
+            loaded_room["type"] = room.r_type
+            loaded_room["capacity"] = room.capacity
+            loaded_room["occupants"] = room.occupants
+            Amity.room_list.append(loaded_room)
+        for person in people:
+            loaded_person = {}
+            loaded_person["id"] = person.person_id
+            loaded_person["first_name"] = person.first_name
+            loaded_person["last_name"] = person.last_name
+            loaded_person["accomodated"] = person.accomodated
+            loaded_person["designation"] = person.designation
+            loaded_person["office"] = person.office
+            loaded_person["livingspace"] = person.l_space
+            Amity.people_list.append(loaded_person)
 
     @staticmethod
     def save_state(db_name=None):
