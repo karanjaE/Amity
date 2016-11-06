@@ -44,12 +44,13 @@ class Amity:
     def generate_random_room(room_type):
         """Generates a random room of the given type."""
         if room_type.upper() == 'L':
-            # print(Amity.room_list)
             rooms = [room["name"] for room in Amity.room_list
-                     if room["type"] == "LIVINGSPACE"]
+                     if room["type"] == "LIVINGSPACE"
+                     and room["occupants"] < room["capacity"]]
         elif room_type.upper() == "O":
             rooms = [room["name"] for room in Amity.room_list
-                     if room["type"] == "OFFICE"]
+                     if room["type"] == "OFFICE"
+                     and room["occupants"] < room["capacity"]]
 
         if len(rooms) > 0:
             return random.choice(rooms)
@@ -57,7 +58,7 @@ class Amity:
             return "None"
 
     @staticmethod
-    def add_person(first_name, last_name, designation, needs_accomodation="N"):
+    def add_person(first_name, last_name, designation, needs_accomodation="NO"):
         """Adds a new person and allocates a random room to them."""
         if not first_name.isalpha() or not last_name.isalpha():
             print("Error! Names can only have alphabets!")
@@ -72,14 +73,25 @@ class Amity:
             allocated_office = Amity.generate_random_room("O")
             allocated_lspace = Amity.generate_random_room("L")
             new_person = {}
-            new_person["first_name"] = first_name
-            new_person["last_name"] = last_name
-            new_person["accomodated"] = needs_accomodation
+            new_person["first_name"] = first_name.upper()
+            new_person["last_name"] = last_name.upper()
             new_person["office"] = allocated_office
-            if designation.upper() in ["F", "FELLOW"]:
-                new_person["designation"] = Fellow.designation
-                
-
+            if designation.upper() in ["F", "FELLOW"] and \
+            needs_accomodation.upper() in ["Y", "YES"]:
+                new_person["accomodated"] = "YES"
+                new_person["livingspace"] = allocated_lspace
+            else:
+                new_person["accomodated"] = needs_accomodation.upper()
+                new_person["livingspace"] = "N/A"
+            Amity.people_list.append(new_person)
+            if allocated_office != "None":
+                for room in Amity.room_list:
+                    if room["name"] == allocated_office:
+                        room["occupants"] += 1
+            if allocated_lspace != "None" and needs_accomodation not in ["N", "NO"]:
+                for room in Amity.room_list:
+                    if room["name"] == allocated_lspace:
+                        room["occupants"] += 1
 
     @staticmethod
     def load_people(filename):
