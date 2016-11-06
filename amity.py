@@ -110,15 +110,8 @@ class Amity:
             print("File loaded.")
 
     @staticmethod
-    def reallocate_person(full_name, room_type, new_room):
+    def reallocate_person(person_id, room_type, new_room):
         """Moves a person to another room"""
-        # get available office
-        # get available lspace
-        # check if the person exists
-        # check if person is eligible for that room
-        # get person's current office
-        # get person's current living_space
-        # check if prson is already in that room
         pass
 
     @staticmethod
@@ -174,32 +167,35 @@ class Amity:
                     print(member)
 
     @staticmethod
-    def load_state(dbname):
+    def load_state(dbname=None):
         """Loads data from a DB file into the app."""
-        engine = create_engine("sqlite:///" + dbname + ".sqlite")
-        Session = sessionmaker()
+        engine=create_engine("sqlite:///" + dbname + ".sqlite")
+        Session=sessionmaker()
         Session.configure(bind=engine)
-        session = Session()
-        people = session.query(Person).all()
-        rooms = session.query(Room).all()
-
-        for room in rooms:
-            loaded_room = {}
-            loaded_room["name"] = room.name
-            loaded_room["type"] = room.r_type
-            loaded_room["capacity"] = room.capacity
-            loaded_room["occupants"] = room.occupants
-            Amity.room_list.append(loaded_room)
-        for person in people:
-            loaded_person = {}
-            loaded_person["id"] = person.person_id
-            loaded_person["first_name"] = person.first_name
-            loaded_person["last_name"] = person.last_name
-            loaded_person["accomodated"] = person.accomodated
-            loaded_person["designation"] = person.designation
-            loaded_person["office"] = person.office
-            loaded_person["livingspace"] = person.l_space
-            Amity.people_list.append(loaded_person)
+        session=Session()
+        people=session.query(Person).all()
+        rooms=session.query(Room).all()
+        if not dbname:
+            print("You must select a db to load.")
+        else:
+            for room in rooms:
+                loaded_room={}
+                loaded_room["name"]=room.name
+                loaded_room["type"]=room.r_type
+                loaded_room["capacity"]=room.capacity
+                loaded_room["occupants"]=room.occupants
+                Amity.room_list.append(loaded_room)
+            for person in people:
+                loaded_person={}
+                loaded_person["id"]=person.person_id
+                loaded_person["first_name"]=person.first_name
+                loaded_person["last_name"]=person.last_name
+                loaded_person["accomodated"]=person.accomodated
+                loaded_person["designation"]=person.designation
+                loaded_person["office"]=person.office
+                loaded_person["livingspace"]=person.l_space
+                Amity.people_list.append(loaded_person)
+            print("Data from %s loaded to the app." % dbname)
 
     @staticmethod
     def save_state(db_name=None):
