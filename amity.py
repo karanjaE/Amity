@@ -106,33 +106,40 @@ class Amity:
     @staticmethod
     def reallocate_person(full_name, room_type, new_room):
         """Moves a person to another room"""
-        pass
-
-    @staticmethod
-    def remove_person(first_name, last_name):
-        """Removes a person from the system"""
-        pass
+        # get available office
+        # get available lspace
+        # check if the person exists
+        # check if person is eligible for that room
+        # get person's current office
+        # get person's current living_space
+        # check if prson is already in that room
 
     @staticmethod
     def print_room(room_name):
         """Returns all the members of a given room"""
-        all_rooms = [room.r_name for room in Amity.room_list]
-        room_members = []
-        if room_name not in all_rooms:
-            print("Room does not exist")
+        if room_name.upper() not in [room["name"] for room in Amity.room_list]:
+            print("%s does't exist." % room_name)
         else:
-            for person in Amity.people_list:
-                if type(person.office) == object or type(person.living_space) == object:
-                    if person.office == room_name or person.living_space == room_name:
-                        full_name = person.first_name + " " + person.last_name
-                        room_members.append(full_name)
-            print(room_members if len(room_members) > 0 else "Room is empty")
-
+            occupants = [person["first_name"] + " " + person["last_name"] for
+                         person in Amity.people_list if
+                         person["office"] == room_name.upper() or
+                         person["livingspace"] == room_name.upper()]
+            if len(occupants) == 0:
+                print("%s is empty" % room_name.upper())
+            else:
+                print(occupants)
 
     @staticmethod
     def print_allocations():
         """Prints all the people that have rooms and arranges by room"""
-        pass
+        no_office = [person["first_name"] + " " + person["last_name"]
+                     for person in Amity.people_list
+                     if person["office"] == "None"]
+        no_livingspace = [person["first_name"] + " " + person["last_name"]
+                          for person in Amity.people_list
+                          if person["livingspace"] == "None"]
+        print(no_office)
+        print(no_office)
 
     @staticmethod
     def print_unallocated():
@@ -140,6 +147,7 @@ class Amity:
         unallocated_people = []
 
         print("People with no offices:")
+
     @staticmethod
     def load_state():
         """Loads data from a DB file into the app."""
@@ -148,25 +156,4 @@ class Amity:
     @staticmethod
     def save_state(db_name=None):
         """Persists data saved in the app to a db"""
-        if not db_name:
-            db = DatabaseCreator()
-        else:
-            db = DatabaseCreator(db_name)
-        Base.metadata.bind = db.engine
-        s = db.session()
-        for room in Amity.rooms_list:
-            rooms_to_save = Room(
-                name=room.r_name,
-                r_type=room.r_type,
-                capacity=room.capacity,
-                members=room.members
-            )
-        for person in Amity.people_list:
-            people_to_save = Person(
-                first_name=person.first_name,
-                last_name=person.last_name,
-                accomodated=person.accomodate_opt,
-                designation=person.designation,
-                office=person.office,
-                l_space=person.living_space
-            )
+        pass
