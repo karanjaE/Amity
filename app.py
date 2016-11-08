@@ -4,15 +4,16 @@ Amity Allocator
 This system makes it easy to manage rooms and people at Amity.
 Usage:
 	create_room <room_name> <room_type>
-	add_person <first_name> <last_name> <designation> [<needs_accomodation>]
+	add_person <first_name> <last_name> <designation> [--needs_accomodation]
 	print_room <room_name>
-	reallocate_person <name> <room_type> <new_room>
+	reallocate_person <person_id> <new_room>
 	remove_person <name>
 	load_people <filename>
 	print_allocations
-	print_unallocated
-	load_state [<filename>]
-	save_state [<db_name>]
+	print_unallocated [--o=filename]
+	load_state <filename>
+	save_state [--db_name]
+	quit
 	(-i | --interactive)
 Options:
 	-h --help Show this screen.
@@ -109,9 +110,9 @@ class AmityApp(cmd.Cmd):
 	def do_print_unallocated(self, arg):
 		"""
 		Prints all the people that don't have relevant rooms
-		Usage: print_unallocated
+		Usage: print_unallocated [--o=filename]
 		"""
-		Amity.print_unallocated()
+		Amity.print_unallocated(arg["[--o=filename]"])
 
 	@app_exec
 	def do_load_people(self, arg):
@@ -120,6 +121,14 @@ class AmityApp(cmd.Cmd):
 		Usage: load_people <filename>
 		"""
 		Amity.load_people(arg["<filename>"])
+
+	@app_exec
+	def do_reallocate_person(self, arg):
+		"""
+		Reallocates person
+		Usage: <person_id> <room_type> <new_room>
+		"""
+		Amity.reallocate_person(arg["<person_id>"], arg["<new_room>"])
 
 	@app_exec
 	def do_load_state(self, arg):
@@ -135,8 +144,15 @@ class AmityApp(cmd.Cmd):
 		Persists app data into the given db
 		Usage: save_state [<db_name>]
 		"""
-		Amity.save_state(arg["<db_name>"])
+		Amity.save_state(arg["[--db_name]"])
 
+	@app_exec
+	def do_quit(self, arg):
+		"""
+		Exits the app.
+		Usage: quit
+		"""
+		exit()
 
 if __name__ == '__main__':
 	AmityApp().cmdloop()

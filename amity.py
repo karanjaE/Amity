@@ -112,27 +112,34 @@ class Amity:
     @staticmethod
     def reallocate_person(person_id, room_type, new_room):
         """Moves a person to another room"""
-        available_offices = [room["name"] for room in Amity.room_list
-                             if room["type"] == "office" and
-                             room["capacity"] > room["occupants"]]
-        available_l_spaces = [room["name"] for room in Amity.room_list
-                             if room["type"] == "LIVINGSPACE" and
-                             room["capacity"] > room["OFFICE"]]
-        if str(person_id) not in [person["id"] for person in Amity.people_list]:
-            print("Sorry, the person doesn't exist")
-        elif new_room.upper() not in available_offices or new_room.upper() not in available_l_spaces:
-            print("Sorry, the room you selected is not available.")
+        av_offices = [office["name"] for office in Amity.room_list
+                      if office["type"] == "OFFICE"
+                      and office["capacity"] > office["occupants"]]
+        av_l_spaces = [lspace["name"] for lspace in Amity.room_list
+                       if lspace["type"] == "LIVINGSPACE"
+                       and lspace["capacity"] > lspace["occupants"]]
+        if new_room.upper() not in av_offices or new_room.upper() not in av_l_spaces:
+            print("The requested room is not available")
+        elif str(person_id) not in [p["id"] for p in Amity.people_list]:
+            print("The person does't exist.")
         else:
             for person in Amity.people_list:
-                if room_type in ["L", "LIVINGSPACE"] and\
-                person["id"] == person_id and person["livingspace"] == "N/A":
-                    print("Sorry but the person can't get a living space.")
-                elif person["id"] == person_id:
-                    if room_type.upper() in ["O", "OFFICE"]:
-                        person["office"] == new_room.upper()
-                    elif room_type.upper() in ("L", "LIVINGSPACE"):
-                        person["livingspace"] == new_room.upper()
-                    
+                if person["id"] == person_id:
+                    # check if the person is in the room
+                    if person["office"] == new_room.upper()\
+                    or person["livingspace"] == new_room.upper():
+                        print("You can't rellicate into the same room.")
+                    #check if staff wants acc.
+                elif person["accomodated"] in ["NO", "N"] and new_room.upper() not in av_offices:
+                        print("The person disn't qualify for a living space")
+                    else:
+                        # check if the room entered is the right type
+                        for room in Amity.room_list:
+                            else:
+                                if room_type.upper() in
+
+
+
 
 
     @staticmethod

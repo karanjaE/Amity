@@ -13,5 +13,35 @@ from amity import *
 
 class TestAmity(TestCase):
     """Test Amity functionality"""
-    def test_if_create_room_receives_arguments(self):
+    def setUp(self):
+        pass
+
+    def test_it_creates_room(self):
+        pass
+
+    def test_it_generates_random_room(self):
+        pass
+
+    def test_it_adds_person(self):
+        pass
+
+    def test_it_loads_people(self):
+        pass
+
+    def it_reallocates_person(self):
+        pass
+
+    def it_prints_allocations(self):
+        pass
+
+    def it_prints_unallocated(self):
+        pass
+
+    def it_prints_room(self):
+        pass
+
+    def it_loads_state(self):
+        pass
+
+    def it_saves_state(self):
         pass

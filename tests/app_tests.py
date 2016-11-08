@@ -1,4 +1,3 @@
-"""Runs frontend tests.
-"""
+"""Runs frontend tests"""
 
 from unittest import TestCase
