@@ -39,6 +39,7 @@ class Amity:
                 new_room["capacity"] = l_space.capacity
 
             Amity.room_list.append(new_room)
+            print(room_name.upper() + "created successfully.")
 
     @staticmethod
     def generate_random_room(room_type):
@@ -89,6 +90,7 @@ class Amity:
                 new_person["accomodated"] = needs_accomodation.upper()
                 new_person["livingspace"] = "N/A"
             Amity.people_list.append(new_person)
+            print(first_name.upper() + " " + last_name.upper() + "added successfully")
             if allocated_office != "None":
                 for room in Amity.room_list:
                     if room["name"] == allocated_office:
@@ -112,9 +114,57 @@ class Amity:
     @staticmethod
     def reallocate_person(person_id, room_type, new_room):
         """Moves a person to another room"""
+        available_offices = [room["name"] for room in Amity.room_list
+                             if room["type"] == "OFFICE"]
+        available_l_spaces = [room["name"] for room in Amity.room_list
+                              if room["type"] == "LIVINGSPACE"]
         if str(person_id) not in [p["id"] for p in Amity.people_list]:
             print("Person doesn't exist!")
-        else: print("The person exists")
+        elif room_type.upper() not in ["L", "LIVINGSPACE", "O", "OFFICE"]:
+            print("Invalid toom type. Enter 'L'/'LIVINGSPACE/O/OFFICE'")
+        elif new_room.upper() not in [room["name"] for room in Amity.room_list]:
+            print("Room does not exist")
+        else:
+            if room_type.upper() in ["O", "OFFICE"]:
+                if new_room.upper() not in available_offices:
+                    print("Room not available for reallocation")
+                    print("Available Offices")
+                    print(available_offices)
+                else:
+                    for person in Amity.people_list:
+                        cur_office = person["office"]
+                        if person["id"] == str(person_id):
+                            person["office"] = new_room.upper()
+                            print(person["first_name"] + "moved to" + new_room.upper())
+                            for room in Amity.room_list:
+                                if room["name"] == new_room.upper():
+                                    room["occupants"] += 1
+                                if room["name"] == cur_office and cur_office != "None":
+                                    room["occupants"] -= 1
+
+            elif room_type.upper() in ["L", "LIVINGSPACE"]:
+                if new_room.upper() not in available_l_spaces:
+                    print("Room not available for allocation.")
+                    print("Available Living Spaces")
+                    print(available_l_spaces)
+                else:
+                    for person in Amity.people_list:
+                        cur_l_space = person["livingspace"]
+                        if person["id"] == str(person_id)\
+                        and person["designation"] == "STAFF":
+                            print("Staff cannot request accomodation")
+                        elif person["id"] == str(person_id)\
+                        and person["designation"] == "FELLOW":
+                            person["livingspace"] = new_room.upper()
+                            print(person["first_name"] + "moved to" + new_room.upper())
+                            if person["accomodated"] in ["N", "NO"]:
+                                person["accomodated"] == ["Y"]
+                            for room in Amity.room_list:
+                                if room["name"] == new_room.upper():
+                                    room["occupants"] += 1
+                                if room["name"] == cur_l_space and cur_l_space\
+                                not in ["N/A", "None"]:
+                                    room["occupants"] -= 1
 
     @staticmethod
     def print_room(room_name):
@@ -145,22 +195,22 @@ class Amity:
                           person["first_name"] + " " + person["last_name"]
                           for person in Amity.people_list
                           if person["livingspace"] == "None"]
-        print("\n==============\nNo LivingSpace:\n==============")
+        print("\n" + "=" * 30 + "\nNo LivingSpace:\n" + "=" * 30)
         for person in no_livingspace:
             print(person)
-        print("\n==============\nNo Office\n==============")
+        print("\n" + "=" * 30 + "\nNo Office:\n" + "=" * 30)
         for person in no_office:
             print(person)
         if filename:
             file = open(filename + ".txt", "a")
-            file.write("\n==============\nNo LivingSpace:\n==============\n")
+            file.write("\n" + "=" * 30 + "\nNo LivingSpace:\n" + "=" * 30 + "\n")
             for person in no_livingspace:
-                file.write(person)
+                file.write("\n" + person)
                 file.write("\n")
-            file.write("\n==============\nNo Office\n==============\n")
+            file.write("\n" + "=" * 30 + "\nNo Office:\n" + "=" * 30 + "\n")
             for person in no_office:
-                file.write(person)
-                file.write("\n")
+                file.write("\n" + person)
+
             print("%s.txt written successfully" % filename)
 
     @staticmethod
@@ -173,18 +223,17 @@ class Amity:
                        person in Amity.people_list if
                        person["office"] == room or person["livingspace"] == room]
             if len(members) == 0:
-                print("\n\n================\n" + room + "\n================")
+                print("\n\n" + "=" * 30 + "\n" + room + "\n" + "=" * 30)
                 print("Empty")
             else:
-                print("\n\n================\n" + room + "\n================")
+                print("\n\n" + "=" * 30 + "\n" + room + "\n" + "=" * 30)
                 for member in members:
                     print(member)
                 if filename:
                     file = open(filename + ".txt", "a")
-                    file.write("\n\n===============\n%s\n===============\n" %room)
+                    file.write("\n\n" + "=" * 30 + "\n" + room +"\n" + "=" * 30 + "\n")
                     for member in members:
-                        file.write(member)
-                        file.write("\n")
+                        file.write("\n" + member)
 
     @staticmethod
     def load_state(dbname=None):
