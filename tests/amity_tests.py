@@ -19,9 +19,11 @@ class TestAmity(TestCase):
 
     def test_that_a_valid_room_type_is_passed(self):
         Amity.create_room("O", "Krypton")
+        r = Amity.room_list[0]
+        self.assertIn(r["type"], ["OFFICE", "LIVINGSPACE"])
 
     def test_that_a_room_name_has_already_been_taken(self):
-        pass
+        Amity.create_room('L', 'valhalla')
 
     def test_that_room_name_only_has_alphabets(self):
         pass
