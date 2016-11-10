@@ -3,16 +3,15 @@
 Amity Allocator
 This system makes it easy to manage rooms and people at Amity.
 Usage:
-	create_room <room_name> <room_type>
-	add_person <first_name> <last_name> <designation> [--needs_accomodation]
-	print_room <room_name>
-	reallocate_person <person_id> <new_room>
-	remove_person <name>
+	create_room <room_type> <room_name>
+	add_person <first_name> <last_name> <designation> [--needs_accomodation=N]
+	reallocate_person <person_id> <room_type> <new_room>
 	load_people <filename>
-	print_allocations
+	print_room <room_name>
+	print_allocations [--o=filename]
 	print_unallocated [--o=filename]
-	load_state <filename>
-	save_state [--db_name]
+	load_state [--dbname]
+	save_state [--o=db_name]
 	quit
 	(-i | --interactive)
 Options:
@@ -37,7 +36,7 @@ def app_exec(func):
 		try:
 			opt = docopt(fn.__doc__, arg)
 		except DocoptExit as e:
-			msg = "Oops! Invalid command"
+			msg = "Invalid command! See help."
 			print(msg)
 			print(e)
 			return
@@ -57,38 +56,31 @@ def app_exec(func):
 class AmityApp(cmd.Cmd):
 	intro = cprint(figlet_format("Amity Room Allocator", font="bulbhead"),\
 				"yellow")
-	prompt = "Amity -->"
+	prompt = "Amity --> "
 
 	@app_exec
 	def do_create_room(self, arg):
 		"""
 		Creates a new room
-		Usage: create_room <room_name> <room_type>
+		Usage: create_room <room_type> <room_name>...
 		"""
-		try:
-			Amity.create_room(arg["<room_name>"], arg["<room_type>"])
-		except:
-			print("An error occured")
+		names = arg["<room_name>"]
+		rtype = arg["<room_type>"]
+		for name in names:
+			Amity.create_room(rtype, name)
 
 	@app_exec
 	def do_add_person(self, arg):
 		"""
 		Adds a person and allocates rooms if available
-		Usage: add_person <first_name> <last_name> <designation> [<needs_accomodation>]
+		Usage: add_person <first_name> <last_name> <designation> [--needs_accomodation=N]
 		"""
-		try:
-			Amity.add_person(arg["<first_name>"], arg["<last_name>"], \
-					arg["<designation>"], arg["<needs_accomodation>"])
-		except:
-			print("An error occured")
-
-	@app_exec
-	def do_remove_person(self, arg):
-		"""
-		Removes person from the system
-		Usage: remove_person <name>
-		"""
-		Amity.remove_person(arg["<name>"])
+		needs_accomodation = arg['--needs_accomodation']
+		if needs_accomodation is None:
+			needs_accomodation = "N"
+		else:
+			needs_accomodation = "Y"
+		Amity.add_person(arg["<first_name>"], arg["<last_name>"], arg["<designation>"], needs_accomodation)
 
 	@app_exec
 	def do_print_room(self, arg):
@@ -112,7 +104,8 @@ class AmityApp(cmd.Cmd):
 		Prints all the people that don't have relevant rooms
 		Usage: print_unallocated [--o=filename]
 		"""
-		Amity.print_unallocated(arg["[--o=filename]"])
+		filename = arg["--o"] or ""
+		Amity.print_unallocated(filename)
 
 	@app_exec
 	def do_load_people(self, arg):
@@ -126,15 +119,18 @@ class AmityApp(cmd.Cmd):
 	def do_reallocate_person(self, arg):
 		"""
 		Reallocates person
-		Usage: <person_id> <room_type> <new_room>
+		Usage: reallocate_person <person_id> <room_type> <new_room>
 		"""
-		Amity.reallocate_person(arg["<person_id>"], arg["<new_room>"])
+		pid = arg["<person_id>"]
+		rtype = arg["<room_type>"]
+		nroom = arg["<new_room>"]
+		Amity.reallocate_person(pid, rtype, nroom)
 
 	@app_exec
 	def do_load_state(self, arg):
 		"""
 		Loads data from the specified db into the app.
-		Usage: load_state
+		Usage: load_state <filename>
 		"""
 		Amity.load_state(arg["<filename>"])
 
@@ -142,9 +138,13 @@ class AmityApp(cmd.Cmd):
 	def do_save_state(self, arg):
 		"""
 		Persists app data into the given db
-		Usage: save_state [<db_name>]
+		Usage: save_state [--db_name=sqlite_db]
 		"""
-		Amity.save_state(arg["[--db_name]"])
+		db = arg['--db_name']
+		if db:
+			Amity.save_state(db)
+		else:
+			Amity.save_state()
 
 	@app_exec
 	def do_quit(self, arg):

@@ -114,3 +114,6 @@ class TestAmity(TestCase):
 
     def test_save_state(self):
         pass
+
+if __name__ == '__main__':
+    unittest.main()
