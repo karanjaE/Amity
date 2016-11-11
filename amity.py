@@ -39,7 +39,7 @@ class Amity:
                 new_room["capacity"] = l_space.capacity
 
             Amity.room_list.append(new_room)
-            print(room_name.upper() + "created successfully.")
+            print(room_name.upper() + " created successfully.")
 
     @staticmethod
     def generate_random_room(room_type):
@@ -59,16 +59,16 @@ class Amity:
             return "None"
 
     @staticmethod
-    def add_person(first_name, last_name, designation, needs_accomodation="NO"):
+    def add_person(first_name, last_name, designation, needs_accomodation="N"):
         """Adds a new person and allocates a random room to them."""
         if not first_name.isalpha() or not last_name.isalpha():
             print("Error! Names can only have alphabets!")
         elif designation.upper() not in ['S', 'STAFF', 'F', 'FELLOW']:
             print("Invalid designation. Enter F or FELLOW or S or STAFF")
-        elif needs_accomodation.upper() not in ["Y", "YES", "N", "NO"]:
+        elif needs_accomodation.upper() not in ['Y', 'N']:
             print("Invalid option. Enter a valid accomodation request option!")
         elif (designation.upper() in ["S", "STAFF"] and
-              needs_accomodation.upper() in ["Y", "YES"]):
+              needs_accomodation.upper() == "Y"):
             print("Staff members cannot get accomodation!")
         else:
             allocated_office = Amity.generate_random_room("O")
@@ -90,7 +90,7 @@ class Amity:
                 new_person["accomodated"] = needs_accomodation.upper()
                 new_person["livingspace"] = "N/A"
             Amity.people_list.append(new_person)
-            print(first_name.upper() + " " + last_name.upper() + "added successfully")
+            print(first_name.upper() + " " + last_name.upper() + " added successfully")
             if allocated_office != "None":
                 for room in Amity.room_list:
                     if room["name"] == allocated_office:
@@ -238,31 +238,31 @@ class Amity:
     @staticmethod
     def load_state(dbname=None):
         """Loads data from a DB file into the app."""
-        engine=create_engine("sqlite:///" + dbname + ".sqlite")
-        Session=sessionmaker()
+        engine = create_engine("sqlite:///" + dbname + ".sqlite")
+        Session = sessionmaker()
         Session.configure(bind=engine)
-        session=Session()
-        people=session.query(Person).all()
-        rooms=session.query(Room).all()
+        session = Session()
+        people = session.query(Person).all()
+        rooms = session.query(Room).all()
         if not dbname:
             print("You must select a db to load.")
         else:
             for room in rooms:
-                loaded_room={}
-                loaded_room["name"]=room.name
-                loaded_room["type"]=room.r_type
-                loaded_room["capacity"]=room.capacity
-                loaded_room["occupants"]=room.occupants
+                loaded_room = {}
+                loaded_room["name"] = room.name
+                loaded_room["type"] = room.r_type
+                loaded_room["capacity"] = room.capacity
+                loaded_room["occupants"] = room.occupants
                 Amity.room_list.append(loaded_room)
             for person in people:
-                loaded_person={}
-                loaded_person["id"]=person.person_id
-                loaded_person["first_name"]=person.first_name
-                loaded_person["last_name"]=person.last_name
-                loaded_person["accomodated"]=person.accomodated
-                loaded_person["designation"]=person.designation
-                loaded_person["office"]=person.office
-                loaded_person["livingspace"]=person.l_space
+                loaded_person = {}
+                loaded_person["id"] = person.person_id
+                loaded_person["first_name"] = person.first_name
+                loaded_person["last_name"] = person.last_name
+                loaded_person["accomodated"] = person.accomodated
+                loaded_person["designation"] = person.designation
+                loaded_person["office"] = person.office
+                loaded_person["livingspace"] = person.l_space
                 Amity.people_list.append(loaded_person)
             print("Data from %s loaded to the app." % dbname)
 
