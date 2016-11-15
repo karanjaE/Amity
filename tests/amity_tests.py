@@ -3,6 +3,7 @@
 import os
 
 from unittest import TestCase
+from mock import patch
 
 from amity import *
 # from db.migration import Base, Person, Room, DatabaseCreator
@@ -13,35 +14,51 @@ from amity import *
 class TestAmity(TestCase):
     """Test Amity functionality"""
 
-    def setUp(self):
-        pass
-
-    def test_that_it_creates_room(self):
+    def test_it_creates_livingspace(self):
         Amity.create_room('L', 'valhalla')
-        Amity.create_room('O', 'jade')
-        Amity.create_room('L', 'krypton')
-        rooms = [r["name"] for r in Amity.room_list]
-        self.assertIn("VALHALLA", rooms)
-        res = "Dang! Name already taken. Enter another"
-        self.assertEqual(Amity.create_room('L','valhalla'), None, msg=res)
-        room1 = [room for room in Amity.room_list if room["name"] == "VALHALLA"]
-        self.assertEqual(room1[0]["capacity"], 6)
-        room2 = [room for room in Amity.room_list]
+        room_names = [r.name for r in Amity.room_list]
+        self.assertIn("VALHALLA", room_names)
+        room1 = [room for room in Amity.room_list
+                 if room.name == "VALHALLA"][0]
+        self.assertEqual(room1.capacity, 4)
+
+    def test_it_creates_office(self):
+        Amity.create_room("O", "krypton")
+        room_names = [r.name  for r in Amity.room_list]
+        self.assertIn("KRYPTON", room_names)
+        room = [room for room in Amity.room_list
+                if room.name == "KRYPTON"][0]
+        self.assertEqual(room.capacity, 6)
 
     def test_it_adds_person(self):
-        Amity.add_person('Jonny', 'Walker', 'f', 'y')
         Amity.add_person('jack', 'daniels', 'f', 'n')
-        Amity.add_person('the', 'rock', 's')
-        Amity.add_person('stone','cold','s','n')
         self.assertTrue(len(Amity.people_list))
-        fnames = [p["first_name"] for p in Amity.people_list]
-        self.assertIn("JACK", fnames)
+        names = [p.name for p in Amity.people_list]
+        self.assertIn("JACK DANIELS", names)
+
+    def test_generate_random_room_none_with_no_rooms(self):
+        random_lspace = Amity.generate_random_lspace()
+        self.assertEqual(random_lspace, "None")
+        random_office = Amity.generate_random_office()
+        self.assertEqual(random_office, "None")
+
+    @patch('amity.Office')
+    def test_generate_random_office_with_rooms(self, mocked_office):
+        mocked_office().name = "SHIRE"
+        Amity.create_room("O", "Shire")
+        random_office = Amity.generate_random_office()
+        self.assertEqual(random_office.name, mocked_office().name)
+
+    @patch('amity.LivingSpace')
+    def test_generate_random_lspace_with_rooms(self, mocked_lspace):
+        mocked_lspace().name = "OCCULUC"
+        Amity.create_room("L", "OCCULUC")
+        random_lspace = Amity.generate_random_lspace()
+        self.assertEqual(random_lspace.name, mocked_lspace().name)
 
     def test_that_it_reallocates_person(self):
-        Amity.create_room('L', 'shire')
-        Amity.reallocate_person(1, 'l', 'shire')
-        r = Amity.people_list[0]["livingspace"]
-        self.assertEqual(r, "SHIRE")
+        # Amity.reallocate_person(id, )
+        pass
 
     def test_it_prints_allocations(self):
         Amity.print_allocations('testfile')

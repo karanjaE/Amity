@@ -66,6 +66,12 @@ class AmityApp(cmd.Cmd):
 		"""
 		names = arg["<room_name>"]
 		rtype = arg["<room_type>"]
+		if not len(names) or not rtype:
+			print("Make sure you enter all details")
+		elif rtype.upper() not in ["L", "O"]:
+			print("Invalid room type entered. Use either O or L")
+		elif 
+		elif not
 		for name in names:
 			Amity.create_room(rtype, name)
 
@@ -94,9 +100,10 @@ class AmityApp(cmd.Cmd):
 	def do_print_allocations(self, arg):
 		"""
 		Prints all rooms and the people in them.
-		Usage: print_allocations
+		Usage: print_allocations [--o=filename]
 		"""
-		Amity.print_allocations()
+		filename = arg["--o"] or ""
+		Amity.print_allocations(filename)
 
 	@app_exec
 	def do_print_unallocated(self, arg):

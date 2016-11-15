@@ -15,10 +15,7 @@ class Person(Base):
 	person_id = Column(String, nullable=False, primary_key=True)
 	first_name = Column(String, nullable=False)
 	last_name = Column(String, nullable=False)
-	accomodated = Column(String)
 	designation = Column(String, nullable=False)
-	office = Column(String, nullable=False)
-	l_space = Column(String)
 
 
 class Room(Base):
@@ -29,7 +26,22 @@ class Room(Base):
 	name = Column(String, nullable=False)
 	r_type = Column(String, nullable=False)
 	capacity = Column(Integer, nullable=False)
-	occupants = Column(Integer)
+
+
+class OfficeAllocations(Base):
+	"""Store office allocations"""
+	# __tablename__ = "office_allocations"
+	# id = Column(Integer, primary_key=True, autoincrement=True)
+	# room_name = Column(String)
+	pass
+
+
+class LivingSpaceAllocations(Base):
+	"""Store living space allocations"""
+
+	pass
+
+
 
 
 class DatabaseCreator(object):
