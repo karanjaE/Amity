@@ -61,18 +61,19 @@ class Amity:
     def add_person(first_name, last_name, designation, needs_accomodation="N"):
         """Adds a new person and allocates a random room to them."""
         allocated_office = Amity.generate_random_office()
-        mapping = {"F": Fellow, "S": Staff, "FELLOW": Fellow, "STAFF": Staff}
+        mapping = {"F": Fellow, "S": Staff}
         person_id = len(Amity.people_list) + 1
         new_person = mapping[designation.upper()](person_id, first_name.upper(),
                                                   last_name.upper(),
-                                                  designation.upper())
+                                                  designation)
         Amity.people_list.append(new_person)
-        Amity.office_allocations[allocated_office].append(first_name
-                                                          + " " + last_name)
+        Amity.office_allocations[allocated_office].append(first_name.upper()
+                                                          + " " + last_name.upper())
         if needs_accomodation.upper() == "Y" and designation.upper() == "F":
             allocated_lspace = Amity.generate_random_lspace()
-            Amity.lspace_allocations[allocated_lspace].append(first_name
-                                                              + " " + last_name)
+            Amity.lspace_allocations[allocated_lspace].append(first_name.upper()
+                                                              + " " + last_name.upper())
+        print("Success!")
 
     @staticmethod
     def load_people(filename):
@@ -109,7 +110,7 @@ class Amity:
                 if new_room in av_offices and new_room not in av_lspaces:
                     print("The room selected is not a LivingSpace.")
                 elif full_name not in fellows:
-                    print("The person has to exist and be a fellow!")
+                    return("The person has to exist and be a fellow!")
                 else:
                     for room in Amity.lspace_allocations.keys():
                         if full_name in Amity.lspace_allocations[room]:
@@ -131,20 +132,18 @@ class Amity:
     @staticmethod
     def print_room(room_name):
         """Returns all the members of a given room"""
-        if room_name.upper() not in Amity.office_allocations.keys():
-            print("The room does not exist.")
+        offices = [room for room in Amity.office_allocations
+                   if room != "None"]
+        lspaces = [room for room in Amity.lspace_allocations
+                   if room != "None"]
+        if room_name.upper() not in offices and room_name.upper() not in lspaces:
+            print("The room doesn't exist")
         else:
-            print("=" * 30 + "\n" + room_name.upper() + "\n" + "=" * 30)
-            if not len(Amity.office_allocations[room_name.upper()]):
-                print("Empty")
-            else:
+            print("=" * 30 + "\nMembes\n" + "=" * 30)
+            if room_name.upper() in offices:
                 for person in Amity.office_allocations[room_name.upper()]:
                     print(person)
-        if room_name.upper() in Amity.office_allocations.keys():
-            print("=" * 30 + "\n" + room_name.upper() + "\n" + "=" * 30)
-            if not len(Amity.lspace_allocations[room_name.upper()]):
-                print("Empty")
-            else:
+            elif room_name.upper() in lspaces:
                 for person in Amity.lspace_allocations[room_name.upper()]:
                     print(person)
 
@@ -233,7 +232,7 @@ class Amity:
     def save_state(db_name=None):
         """Persists data saved in the app to a db"""
         if not db_name:
-            db = DatabaseCreator()
+            db = DatabaseCreator("default_db")
         else:
             db = DatabaseCreator(db_name)
         Base.metadata.bind = db.engine

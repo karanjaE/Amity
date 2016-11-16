@@ -89,15 +89,12 @@ class AmityApp(cmd.Cmd):
 			print("Names can only contain alphabets.")
 		elif designation.upper() not in ["F", "S"]:
 			print("Invalid designation. Enter F or S")
-		elif needs_accomodation.upper() not in ["Y", "N"]:
-			print("Invalid accomodation option. Enter Y or N")
-		elif designation.upper() == "S" and needs_accomodation.upper() == "Y":
-			print("Staff cannot get accomodation!")
+
 		else:
 			if not needs_accomodation:
-				needs_accomodation = "N"
-			Amity.add_person(fname,lname, designation, needs_accomodation)
-			print(fname.upper() + " " + lname.upper() + "added.")
+				Amity.add_person(fname.upper(), lname.upper(), designation.upper())
+			else:
+				Amity.add_person(fname.upper(), lname.upper(), designation.upper(), arg["--needs_accomodation"])
 
 	@app_exec
 	def do_print_room(self, arg):
@@ -138,12 +135,13 @@ class AmityApp(cmd.Cmd):
 	def do_reallocate_person(self, arg):
 		"""
 		Reallocates person
-		Usage: reallocate_person <full_name> <room_type> <new_room>
+		Usage: reallocate_person <f_name> <l_name> <room_type> <new_room>
 		"""
-		full_name = arg["<full_name>"]
+		f_name = arg["<f_name>"]
+		l_name = arg["<l_name>"]
 		rtype = arg["<room_type>"]
 		nroom = arg["<new_room>"]
-		Amity.reallocate_person(full_name, rtype, nroom)
+		Amity.reallocate_person(f_name, l_name, rtype, nroom)
 
 	@app_exec
 	def do_load_state(self, arg):
