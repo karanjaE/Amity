@@ -12,9 +12,8 @@ class Person(Base):
 	"""Create people table
 	"""
 	__tablename__ = 'person'
-	person_id = Column(String, nullable=False, primary_key=True)
-	first_name = Column(String, nullable=False)
-	last_name = Column(String, nullable=False)
+	person_id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+	name = Column(String, nullable=False)
 	designation = Column(String, nullable=False)
 
 
@@ -23,25 +22,25 @@ class Room(Base):
 	"""
 	__tablename__ = 'room'
 	id = Column(Integer, primary_key=True, autoincrement=True)
-	name = Column(String, nullable=False)
-	r_type = Column(String, nullable=False)
+	name = Column(String(32), nullable=False)
+	rtype = Column(String(32), nullable=False)
 	capacity = Column(Integer, nullable=False)
 
 
 class OfficeAllocations(Base):
 	"""Store office allocations"""
-	# __tablename__ = "office_allocations"
-	# id = Column(Integer, primary_key=True, autoincrement=True)
-	# room_name = Column(String)
-	pass
+	__tablename__ = "office_allocations"
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	room_name = Column(String(32), nullable=False)
+	members = Column(String(250))
 
 
 class LivingSpaceAllocations(Base):
 	"""Store living space allocations"""
-
-	pass
-
-
+	__tablename__ = "livingspace_allocations"
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	room_name = Column(String(32), nullable=False)
+	members = Column(String(250))
 
 
 class DatabaseCreator(object):

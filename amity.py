@@ -5,7 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tabulate import tabulate
 
-from db.migration import Base, Person, Room, DatabaseCreator
+from db.migration import (Base, Person, Room, DatabaseCreator,
+                          OfficeAllocations, LivingSpaceAllocations)
 from person.person import Fellow, Staff
 from room.room import LivingSpace, Office
 
@@ -101,35 +102,66 @@ class Amity:
     @staticmethod
     def reallocate_person(fname, lname, room_type, new_room):
         """Moves a person to another room"""
-        # available_offices = [room for room in Amity.office_allocations.keys()
-        #                      if len(Amity.office_allocations[room]) < 6
-        #                      and room != "None"]
-        # available_lspaces = [room for room in Amity.lspace_allocations.keys()
-        #                      if len(Amity.lspace_allocations[room]) < 4
-        #                      and room != "None"]
-        # name = fname + " " + lname
-        # if room_type.upper() == "L":
-        pass
+        full_name = fname.upper() + " " + lname.upper()
+        fellows = [p.name for p in Amity.people_list
+                   if p.designation == "FELLOW"]
+        staff = [p.name for p in Amity.people_list
+                 if p.designation == "STAFF"]
+        av_lspaces = [r.name for r in Amity.room_list
+                      if r.type == "LIVINGSPACE"
+                      and len(Amity.lspace_allocations[r.name]) < 4]
+        av_offices = [r.name for r in Amity.room_list
+                      if r.type == "OFFICE"
+                      and len(Amity.office_allocations[r.name]) < 6]
+        if full_name not in fellows and full_name not in staff:
+            print("The person doesn't exist.")
+        elif new_room.upper() not in av_lspaces and new_room.upper() not in av_offices:
+            print("The room requested does not exist or is not available")
+            print("Available Offices \n" + av_offices)
+            print("Available living spaces\n" + av_lspaces)
+        else:
+            if room_type.upper() == "L":
+                if new_room in av_offices and new_room not in av_lspaces:
+                    print("The room selected is not a LivingSpace.")
+                elif full_name not in fellows:
+                    print("The person has to exist and be a fellow!")
+                else:
+                    for room in Amity.lspace_allocations.keys():
+                        if full_name in Amity.lspace_allocations[room]:
+                            cur_lspace = Amity.lspace_allocations[room]
+                            cur_lspace.remove(full_name)
+                            Amity.lspace_allocations[new_room.upper()].append(full_name)
+                            print("Success!")
+            elif room_type.upper() == "O":
+                if new_room not in av_offices and new_room in av_lspaces:
+                    print("The room selected is not an office")
+                else:
+                    for room in Amity.lspace_allocations.keys():
+                        if full_name in Amity.office_allocations[room]:
+                            cur_office = Amity.office_allocations[room]
+                            cur_office.remove(full_name)
+                            Amity.office_allocations[new_room.upper()].append(full_name)
+                            print("Success!")
 
     @staticmethod
     def print_room(room_name):
         """Returns all the members of a given room"""
-        if room_name.upper() in Amity.office_allocations.keys():
+        if room_name.upper() not in Amity.office_allocations.keys():
+            print("The room does not exist.not ")
+        else:
             print("=" * 30 + "\n" + room_name.upper() + "\n" + "=" * 30)
             if not len(Amity.office_allocations[room_name.upper()]):
                 print("Empty")
             else:
                 for person in Amity.office_allocations[room_name.upper()]:
                     print(person)
-        elif room_name.upper() in Amity.office_allocations.keys():
+        if room_name.upper() in Amity.office_allocations.keys():
             print("=" * 30 + "\n" + room_name.upper() + "\n" + "=" * 30)
             if not len(Amity.lspace_allocations[room_name.upper()]):
                 print("Empty")
             else:
                 for person in Amity.lspace_allocations[room_name.upper()]:
                     print(person)
-        else:
-            print("The room does not exist")
 
     @staticmethod
     def print_unallocated(filename=None):
@@ -185,37 +217,37 @@ class Amity:
                         file.write(person)
             print("%s.txt written" % filename)
 
-    @staticmethod
-    def load_state(dbname=None):
-        """Loads data from a DB file into the app."""
-        engine = create_engine("sqlite:///" + dbname + ".sqlite")
-        Session = sessionmaker()
-        Session.configure(bind=engine)
-        session = Session()
-        people = session.query(Person).all()
-        rooms = session.query(Room).all()
-        if not dbname:
-            print("You must select a db to load.")
-        else:
-            for room in rooms:
-                loaded_room = {}
-                loaded_room["name"] = room.name
-                loaded_room["type"] = room.r_type
-                loaded_room["capacity"] = room.capacity
-                loaded_room["occupants"] = room.occupants
-                Amity.room_list.append(loaded_room)
-            for person in people:
-                loaded_person = {}
-                loaded_person["id"] = person.person_id
-                loaded_person["first_name"] = person.first_name
-                loaded_person["last_name"] = person.last_name
-                loaded_person["accomodated"] = person.accomodated
-                loaded_person["designation"] = person.designation
-                loaded_person["office"] = person.office
-                loaded_person["livingspace"] = person.l_space
-                Amity.people_list.append(loaded_person)
-            print("Data from %s loaded to the app." % dbname)
-
+    # @staticmethod
+    # def load_state(dbname=None):
+    #     """Loads data from a DB file into the app."""
+    #     engine = create_engine("sqlite:///" + dbname + ".sqlite")
+    #     Session = sessionmaker()
+    #     Session.configure(bind=engine)
+    #     session = Session()
+    #     people = session.query(Person).all()
+    #     rooms = session.query(Room).all()
+    #     if not dbname:
+    #         print("You must select a db to load.")
+    #     else:
+    #         for room in rooms:
+    #             loaded_room = {}
+    #             loaded_room["name"] = room.name
+    #             loaded_room["type"] = room.r_type
+    #             loaded_room["capacity"] = room.capacity
+    #             loaded_room["occupants"] = room.occupants
+    #             Amity.room_list.append(loaded_room)
+    #         for person in people:
+    #             loaded_person = {}
+    #             loaded_person["id"] = person.person_id
+    #             loaded_person["first_name"] = person.first_name
+    #             loaded_person["last_name"] = person.last_name
+    #             loaded_person["accomodated"] = person.accomodated
+    #             loaded_person["designation"] = person.designation
+    #             loaded_person["office"] = person.office
+    #             loaded_person["livingspace"] = person.l_space
+    #             Amity.people_list.append(loaded_person)
+    #         print("Data from %s loaded to the app." % dbname)
+    #
     @staticmethod
     def save_state(db_name=None):
         """Persists data saved in the app to a db"""
@@ -227,21 +259,30 @@ class Amity:
         db_session = db.session()
         for room in Amity.room_list:
             room_to_save = Room(
-                name=room["name"],
-                r_type=room["type"],
-                capacity=room["capacity"],
-                occupants=room["occupants"]
+                name=room.name,
+                rtype=room.type,
+                capacity=room.capacity
             )
             db_session.merge(room_to_save)
         for person in Amity.people_list:
             person_to_save = Person(
-                person_id=person["id"],
-                first_name=person["first_name"],
-                last_name=person["last_name"],
-                accomodated=person["accomodated"],
-                designation=person["designation"],
-                office=person["office"],
-                l_space=person["livingspace"]
+                # person_id=person.person_id,
+                name=person.name,
+                designation=person.designation
             )
             db_session.merge(person_to_save)
+        for room in Amity.office_allocations:
+            office_members = ",".join(Amity.office_allocations[room])
+            office_allocations_sv = OfficeAllocations(
+                room_name=room,
+                members=office_members
+            )
+            db_session.merge(office_allocations_sv)
+        for room in Amity.lspace_allocations:
+            lspace_members = ",".join(Amity.lspace_allocations[room])
+            lspace_allocations_sv = LivingSpaceAllocations(
+                room_name=room,
+                members=lspace_members
+            )
+            db_session.merge(lspace_allocations_sv)
         db_session.commit()
