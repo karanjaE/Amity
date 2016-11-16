@@ -60,8 +60,7 @@ class AmityApp(cmd.Cmd):
 
 	@app_exec
 	def do_create_room(self, arg):
-		"""
-		Creates a new room
+		"""Creates a new room
 		Usage: create_room <room_type> <room_name>...
 		"""
 		names = arg["<room_name>"]
@@ -70,10 +69,11 @@ class AmityApp(cmd.Cmd):
 			print("Make sure you enter all details")
 		elif rtype.upper() not in ["L", "O"]:
 			print("Invalid room type entered. Use either O or L")
-		elif 
-		elif not
-		for name in names:
-			Amity.create_room(rtype, name)
+		else:
+			for name in names:
+				if not name.isalpha():
+					print("Room name can only contain alphabets. Try again")
+				Amity.create_room(rtype, name)
 
 	@app_exec
 	def do_add_person(self, arg):
@@ -81,12 +81,23 @@ class AmityApp(cmd.Cmd):
 		Adds a person and allocates rooms if available
 		Usage: add_person <first_name> <last_name> <designation> [--needs_accomodation=N]
 		"""
-		needs_accomodation = arg['--needs_accomodation']
-		if needs_accomodation is None:
-			needs_accomodation = "N"
+		fname = arg["<first_name>"]
+		lname = arg["<last_name>"]
+		designation = arg["<designation>"]
+		needs_accomodation = arg["--needs_accomodation"]
+		if not fname.isalpha() or not lname.isalpha():
+			print("Names can only contain alphabets.")
+		elif designation.upper() not in ["F", "S"]:
+			print("Invalid designation. Enter F or S")
+		elif needs_accomodation.upper() not in ["Y", "N"]:
+			print("Invalid accomodation option. Enter Y or N")
+		elif designation.upper() == "S" and needs_accomodation.upper() == "Y":
+			print("Staff cannot get accomodation!")
 		else:
-			needs_accomodation = "Y"
-		Amity.add_person(arg["<first_name>"], arg["<last_name>"], arg["<designation>"], needs_accomodation)
+			if not needs_accomodation:
+				needs_accomodation = "N"
+			Amity.add_person(fname,lname, designation, needs_accomodation)
+			print(fname.upper() + " " + lname.upper() + "added.")
 
 	@app_exec
 	def do_print_room(self, arg):
@@ -121,17 +132,18 @@ class AmityApp(cmd.Cmd):
 		Usage: load_people <filename>
 		"""
 		Amity.load_people(arg["<filename>"])
+		print("File loaded.")
 
 	@app_exec
 	def do_reallocate_person(self, arg):
 		"""
 		Reallocates person
-		Usage: reallocate_person <person_id> <room_type> <new_room>
+		Usage: reallocate_person <full_name> <room_type> <new_room>
 		"""
-		pid = arg["<person_id>"]
+		full_name = arg["<full_name>"]
 		rtype = arg["<room_type>"]
 		nroom = arg["<new_room>"]
-		Amity.reallocate_person(pid, rtype, nroom)
+		Amity.reallocate_person(full_name, rtype, nroom)
 
 	@app_exec
 	def do_load_state(self, arg):
