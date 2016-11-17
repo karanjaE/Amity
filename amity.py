@@ -35,7 +35,7 @@ class Amity:
     @staticmethod
     def generate_random_office():
         """Generates a random room of the given type."""
-        offices = [room for room in Amity.room_list if room.type == "OFFICE"]
+        offices = [room for room in Amity.room_list if room.r_type == "OFFICE"]
         available_offices = []
         for office in offices:
             if office.capacity > len(Amity.office_allocations[office.name]):
@@ -47,7 +47,7 @@ class Amity:
 
     @staticmethod
     def generate_random_lspace():
-        lspaces = [room for room in Amity.room_list if room.type == "LIVINGSPACE"]
+        lspaces = [room for room in Amity.room_list if room.r_type == "LIVINGSPACE"]
         available_l_spaces = []
         for lspace in lspaces:
             if lspace.capacity > len(Amity.lspace_allocations[lspace.name]):
@@ -94,10 +94,10 @@ class Amity:
         staff = [p.name for p in Amity.people_list
                  if p.designation == "STAFF"]
         av_lspaces = [r.name for r in Amity.room_list
-                      if r.type == "LIVINGSPACE"
+                      if r.r_type == "LIVINGSPACE"
                       and len(Amity.lspace_allocations[r.name]) < 4]
         av_offices = [r.name for r in Amity.room_list
-                      if r.type == "OFFICE"
+                      if r.r_type == "OFFICE"
                       and len(Amity.office_allocations[r.name]) < 6]
         if full_name not in fellows and full_name not in staff:
             print("The person doesn't exist.")
@@ -240,7 +240,7 @@ class Amity:
         for room in Amity.room_list:
             room_to_save = Room(
                 name=room.name,
-                rtype=room.type,
+                rtype=room.r_type,
                 capacity=room.capacity
             )
             db_session.merge(room_to_save)

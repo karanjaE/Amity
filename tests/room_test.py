@@ -10,9 +10,9 @@ class TestRoom(TestCase):
     def test_office(self):
         jade =  Office("JADE")
         self.assertEqual(jade.capacity, 6)
-        self.assertEqual(jade.type, "OFFICE")
+        self.assertEqual(jade.r_type, "OFFICE")
 
     def test_living_space(self):
         shire = LivingSpace("SHIRE")
         self.assertEqual(shire.capacity, 4)
-        self.assertEqual(shire.type, "LIVINGSPACE")
+        self.assertEqual(shire.r_type, "LIVINGSPACE")

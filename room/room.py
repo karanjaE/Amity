@@ -2,7 +2,7 @@ class Room(object):
     """Super class for rooms."""
     def __init__(self, r_name=None, r_type=None, capacity=None):
         self.name = r_name
-        self.type = r_type
+        self.r_type = r_type
         self.capacity = capacity
 
 
